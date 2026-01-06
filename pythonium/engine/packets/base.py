@@ -10,6 +10,8 @@ from pythonium.engine.enums import Direction, State
 from pythonium.engine.field import Field
 from pythonium.engine.types import VarInt
 
+from pythonium.engine.packets import PacketStorage
+
 
 class Packet(Struct):
     """Base packet."""
@@ -23,7 +25,6 @@ class Packet(Struct):
 
     def __init_subclass__(cls) -> None:
         super().__init_subclass__()
-
         cls.fields = build_schema(cls)
 
         required_fields = (
@@ -38,6 +39,8 @@ class Packet(Struct):
                     f"{cls.__name__} used Packet, but doesn't have `{field}`."
                 )
                 raise NotImplementedError(msg)
+
+        PacketStorage.add(packet=cls)
 
 
 def build_schema(cls: type[Packet]) -> list[Field]:
