@@ -1,0 +1,59 @@
+[project]
+name = "pythonium"
+version = "0.1.0"
+description = "Minecraft server on python"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "msgspec>=0.20.0",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.14.9",
+    "ty>=0.0.1a35",
+    "mypy>=1.19.1",
+]
+
+[tool.ruff]
+line-length = 79
+indent-width = 4
+target-version = "py314"
+
+[tool.ruff.lint]
+ignore = [
+    "D102",    # undocumented-public-method
+    "D103",    # undocumented-public-function
+    "D104",    # undocumented-public-package
+    "D105", # undocumented-magic-method
+    "D106",    # undocumented-public-nested-class
+    "D107",    # undocumented-public-init
+    "D203",    # one-blank-line-before-class
+    "D212",    # multi-line-summary-first-line
+    "D100", # undocumented-public-module
+    "COM812",  # missing-trailing-comma
+    "TC001", # typing-only-first-party-import
+    "TC003", # typing-only-standard-library-import
+    "RUF001",  # ambiguous-unicode-character-string
+]
+select = ["ALL"]
+fixable = ["ALL"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+docstring-code-line-length = "dynamic"
+
+
+[tool.ty.rules]
+unused-ignore-comment = "warn"       # unused-ignore-comment
+redundant-cast = "ignore"            # redundant-cast
+possibly-unbound-attribute = "error" # possibly-unbound-attribute
+possibly-unbound-import = "error"    # possibly-unbound-import
+
+[tool.ty.environment]
+python-version = "3.14"
+python = "./.venv"
+
+[tool.mypy]
+ignore_missing_imports = true
