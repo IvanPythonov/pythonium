@@ -101,7 +101,7 @@ class Router:
         self._commands.update(router.commands)
         return self
 
-    async def route(self, packet: Packet) -> object:
+    async def route(self, packet: Packet) -> Packet | None:
         """Route command to appropriate handler."""
         func = self.resolve_router(packet=type(packet))
 
