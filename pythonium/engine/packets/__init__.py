@@ -1,17 +1,19 @@
-from pythonium.engine.enums import State
+from pythonium.engine.enums import Direction, State
 
 from .base import Packet, deserialize, serialize
 from .handshake import Handshake
+from .packet_storage import PacketStorage
 
-__all__ = ("Handshake", "Packet", "deserialize", "serialize")
+__all__ = ("Handshake", "Packet", "PacketStorage", "deserialize", "serialize")
 
 
 def get_model_by_id(
-    packet_id: int, state: State = State.HANDSHAKING
+    packet_id: int, state: State, direction: Direction
 ) -> type[Packet]:
     """Get model by prefix."""
     for model in Packet.__subclasses__():
-        if model.packet_id == packet_id and model.__state__ == state:
+        key = (packet_id, state, direction)
+        if PacketStorage.get(*key) is model:
             return model
 
     msg = f"Unknown packet_id: {hex(packet_id)}"
