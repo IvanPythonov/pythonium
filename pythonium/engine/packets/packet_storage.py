@@ -5,7 +5,7 @@ from pythonium.engine.packets import Packet
 
 
 class PacketStorage:
-    """Packet storage."""
+    """O(1) packet storage."""
 
     _packets: ClassVar[dict[tuple[int, State, Direction], type[Packet]]] = {}
 
