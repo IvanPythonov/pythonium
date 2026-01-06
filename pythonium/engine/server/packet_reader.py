@@ -1,7 +1,11 @@
 from asyncio import StreamReader
+from collections.abc import AsyncGenerator
 
+from pythonium.engine.client import ClientSession
 from pythonium.engine.codecs import VarIntCodec
 from pythonium.engine.constants import MAX_PACKET_LENGTH
+from pythonium.engine.enums import Direction
+from pythonium.engine.packets import Packet, deserialize, get_model_by_id
 
 
 class PacketReader:
@@ -29,3 +33,19 @@ class PacketReader:
             raise ValueError(msg)
 
         return await self._reader.readexactly(length)
+
+    async def read(
+        self, client_session: ClientSession
+    ) -> AsyncGenerator[Packet]:
+        packet_data = await self.read_packet()
+        packet_id, _consumed = VarIntCodec().deserialize(packet_data)
+
+        model = get_model_by_id(
+            packet_id=packet_id,
+            state=client_session.state,
+            direction=Direction.SERVERBOUND,
+        )
+
+        packet = deserialize(model, packet_data)
+
+        yield packet
