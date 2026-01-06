@@ -8,9 +8,8 @@ from msgspec.structs import fields as class_fields
 from pythonium.engine.codecs import VarIntCodec, resolve_codec
 from pythonium.engine.enums import Direction, State
 from pythonium.engine.field import Field
-from pythonium.engine.types import VarInt
-
 from pythonium.engine.packets import PacketStorage
+from pythonium.engine.types import VarInt
 
 
 class Packet(Struct):
