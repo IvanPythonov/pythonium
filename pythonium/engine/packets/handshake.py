@@ -1,4 +1,4 @@
-from pythonium.engine.enums import Direction, NextStateEnum, State
+from pythonium.engine.enums import Direction, State
 from pythonium.engine.packets import Packet
 from pythonium.engine.types import String, UnsignedShortCodec, VarInt
 
@@ -12,4 +12,4 @@ class Handshake(Packet, kw_only=True):
     packet_id: VarInt = 0x00
     server_address: String
     server_port: UnsignedShortCodec
-    intent: NextStateEnum
+    intent: VarInt
