@@ -4,9 +4,8 @@ from typing import ClassVar
 
 from pythonium.engine import Client, Router
 from pythonium.engine.client import ClientConnection, ClientSession
-from pythonium.engine.codecs import VarIntCodec
-from pythonium.engine.enums import Direction, State
-from pythonium.engine.packets import deserialize, get_model_by_id
+from pythonium.engine.enums import State
+from pythonium.engine.packets import serialize
 from pythonium.engine.server import PacketReader
 
 logger = getLogger(__name__)
@@ -46,30 +45,19 @@ class Server(Router):
 
         packet_reader = PacketReader(reader)
 
-        packet_data = await packet_reader.read_packet()
-        packet_id, consumed = VarIntCodec().deserialize(packet_data)
-        payload = packet_data[consumed:]
+        async for packet in packet_reader.read(client_session=client.session):
+            server_packet = await self.route(packet)
+            if not server_packet:
+                continue
+            serialized_packet = serialize(server_packet)
 
-        model = get_model_by_id(
-            packet_id=packet_id,
-            state=client.session.state,
-            direction=Direction.SERVERBOUND,
-        )
+            await client.connection.write(serialized_packet)
 
-        await super().route(
-            deserialize(
-                cls=model,
-                data=packet_data,
-            )
-        )
-        logger.info("Received packet with ID %s", hex(packet_id))
+            logger.info("Received packet with ID %s", hex(packet.packet_id))
 
-        # try:
-        #     raise TypeError
-        # except NotImplementedError:
-        #     self.remove_client(client)
-        #     logger.info("Disconnected from %s", addr)
-        #     await client.disconnect()
+        self.remove_client(client)
+        logger.info("Disconnected from %s", addr)
+        await client.connection.disconnect()
 
     async def serve(self) -> None:
         server = await start_server(
