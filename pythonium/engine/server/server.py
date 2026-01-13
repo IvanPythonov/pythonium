@@ -1,6 +1,5 @@
 from asyncio import StreamReader, StreamWriter, start_server
 from logging import getLogger
-from typing import ClassVar
 
 from pythonium.engine import Client, Router
 from pythonium.engine.client import ClientConnection, ClientSession
@@ -14,12 +13,13 @@ logger = getLogger(__name__)
 class Server(Router):
     """Class representing Minecraft server."""
 
-    _clients: ClassVar[list[Client]] = []
-
     def __init__(
         self, host: str = "127.0.0.1", port: int = 25565, **kwargs: object
     ) -> None:
         super().__init__(name=self.__class__.__name__, kwargs=kwargs)
+
+        self._clients: list[Client] = []
+
         self.host = host
         self.port = port
 
@@ -29,7 +29,8 @@ class Server(Router):
 
     def remove_client(self, client: Client) -> None:
         """Remove a client from the server."""
-        self._clients.remove(client)
+        if client in self._clients:
+            self._clients.remove(client)
 
     async def _handle_connection(
         self, reader: StreamReader, writer: StreamWriter
@@ -46,9 +47,10 @@ class Server(Router):
         packet_reader = PacketReader(reader)
 
         async for packet in packet_reader.read(client_session=client.session):
-            server_packet = await self.route(packet)
+            server_packet = await self.route(packet, client=client)
             if not server_packet:
                 continue
+
             serialized_packet = serialize(server_packet)
 
             await client.connection.write(serialized_packet)
