@@ -4,7 +4,7 @@ import asyncio
 import logging
 
 from pythonium.engine import Server
-from pythonium.server.routers import handshake_router
+from pythonium.server.routers import handshake_router, status_router
 
 logging.basicConfig(level=logging.INFO)
 
@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.INFO)
 async def main() -> None:
     server = Server()
 
-    server.include_router(handshake_router)
+    server.include_routers(handshake_router, status_router)
 
     await server.serve()
 
