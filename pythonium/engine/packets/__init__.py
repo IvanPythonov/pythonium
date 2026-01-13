@@ -1,18 +1,19 @@
 from pythonium.engine.enums import Direction, State
 
 from .base import Packet, deserialize, serialize
-from .handshake import Handshake
+from .client.handshake import Handshake
+from .client.status import GetStatus, Ping
 from .packet_storage import PacketStorage
-from .status import Ping, Pong, ServerStatus, Status
+from .server.status import Pong, ServerStatus
 
 __all__ = (
+    "GetStatus",
     "Handshake",
     "Packet",
     "PacketStorage",
     "Ping",
     "Pong",
     "ServerStatus",
-    "Status",
     "deserialize",
     "serialize",
 )
