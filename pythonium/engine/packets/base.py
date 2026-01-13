@@ -1,6 +1,4 @@
-from typing import (
-    ClassVar,
-)
+from typing import ClassVar
 
 from msgspec import Struct
 from msgspec.structs import fields as class_fields
@@ -8,23 +6,20 @@ from msgspec.structs import fields as class_fields
 from pythonium.engine.codecs import VarIntCodec, resolve_codec
 from pythonium.engine.enums import Direction, State
 from pythonium.engine.field import Field
-from pythonium.engine.packets import PacketStorage
+from pythonium.engine.packets.packet_storage import PacketStorage
 from pythonium.engine.types import VarInt
 
 
-class Packet(Struct):
+class Packet(Struct, kw_only=True):
     """Base packet."""
 
-    fields: ClassVar[list[Field]]
+    __state__: ClassVar[State]
+    __direction__: ClassVar[Direction]
 
-    __state__: State
-    __direction__: Direction
-
-    packet_id: VarInt
+    packet_id: ClassVar[VarInt]
 
     def __init_subclass__(cls) -> None:
         super().__init_subclass__()
-        cls.fields = build_schema(cls)
 
         required_fields = (
             "packet_id",
@@ -41,13 +36,19 @@ class Packet(Struct):
 
         PacketStorage.add(packet=cls)
 
+    @classmethod
+    def fields(cls) -> list[Field]:
+        return build_schema(cls)
+
 
 def build_schema(cls: type[Packet]) -> list[Field]:
     schema_fields: list[Field] = []
+
     for field in class_fields(cls):
         if field.name.startswith("__"):
             continue
-        codec = resolve_codec(field.type)
+
+        codec = resolve_codec(field.type.__value__)
         schema_fields.append(
             Field(
                 name=field.name,
@@ -58,30 +59,23 @@ def build_schema(cls: type[Packet]) -> list[Field]:
 
 
 def serialize(packet: Packet) -> bytes:
-    out = bytearray()
+    payload = bytearray()
+    for field in packet.fields():
+        payload.extend(field.serialize(getattr(packet, field.name)))
 
-    for field in packet.fields:
-        out.extend(field.serialize(value=getattr(packet, field.name)))
+    data_to_be_sent = VarIntCodec().serialize(packet.packet_id) + payload
 
-    return VarIntCodec().serialize(field=len(out)) + out
+    return (
+        VarIntCodec().serialize(len(data_to_be_sent)) + data_to_be_sent
+    )  # HOORAY I FIXED THIS SHIT
 
 
 def deserialize(cls: type[Packet], data: bytes) -> Packet:
     offset = 0
 
-    _length, consumed = VarIntCodec().deserialize(data)
-    offset += consumed
-
-    packet_id, consumed = VarIntCodec().deserialize(data[offset:])
-    offset += consumed
-
-    if packet_id != cls.packet_id:
-        msg = "Packet ID mismatch (expected {cls.packet_id}, got {packet_id})"
-        raise ValueError(msg)
-
     kwargs = {}
 
-    for field in cls.fields:
+    for field in cls.fields():
         value, consumed = field.deserialize(data[offset:])
         kwargs[field.name] = value
         offset += consumed
