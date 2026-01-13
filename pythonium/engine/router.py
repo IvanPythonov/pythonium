@@ -51,7 +51,7 @@ class Router:
         return commands
 
     @property
-    def parent_router(self) -> Router | None:  # pyright: ignore[reportUndefinedVariable]
+    def parent_router(self) -> "Router | None":  # pyright: ignore[reportUndefinedVariable]
         return self._parent_router
 
     @parent_router.setter
@@ -81,7 +81,7 @@ class Router:
         self._parent_router = router
         router.sub_routers.append(self)
 
-    def include_routers(self, *routers: Self) -> None:
+    def include_routers(self, *routers: "Router") -> None:
         """Attach multiple routers."""
         if not routers:
             msg = "At least one router must be provided"
@@ -89,7 +89,7 @@ class Router:
         for router in routers:
             self.include_router(router)
 
-    def include_router(self, router: Router) -> Router:  # pyright: ignore[reportUndefinedVariable]
+    def include_router(self, router: "Router") -> "Router":  # pyright: ignore[reportUndefinedVariable]
         """Attach another router."""
         if not isinstance(router, Router):
             msg = (
@@ -101,7 +101,7 @@ class Router:
         self._commands.update(router.commands)
         return self
 
-    async def route(self, packet: Packet) -> Packet | None:
+    async def route(self, packet: Packet, **kwargs: object) -> Packet | None:
         """Route command to appropriate handler."""
         func = self.resolve_router(packet=type(packet))
 
@@ -109,9 +109,13 @@ class Router:
             return None
 
         sig_params = set(inspect.signature(func).parameters.keys())
-        kwargs = {k: v for k, v in self._kwargs.items() if k in sig_params}
 
-        return await func(packet, **kwargs)
+        all_kwargs = {**self._kwargs, **kwargs}
+        function_kwargs = {
+            k: v for k, v in all_kwargs.items() if k in sig_params
+        }
+
+        return await func(packet, **function_kwargs)
 
     def resolve_router(self, packet: type[Packet]) -> Handler | None:
         packet_name = packet.__name__
