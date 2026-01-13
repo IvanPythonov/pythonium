@@ -6,7 +6,7 @@ from pythonium.engine.enums import State
 
 
 @final
-class ClientSession(Struct, slots=True):
+class ClientSession(Struct):
     """Class representing Minecraft client session."""
 
     state: State = State.HANDSHAKING
