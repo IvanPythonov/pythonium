@@ -1,26 +1,27 @@
-from typing import ClassVar
+from typing import TYPE_CHECKING, ClassVar
 
 from pythonium.engine.enums import Direction, State
-from pythonium.engine.packets import Packet
+
+if TYPE_CHECKING:
+    from pythonium.engine.packets.base import Packet
 
 
 class PacketStorage:
     """O(1) packet storage."""
 
-    _packets: ClassVar[dict[tuple[int, State, Direction], type[Packet]]] = {}
+    _packets: ClassVar[dict[tuple[int, State, Direction], type["Packet"]]] = {}
 
     @classmethod
-    def add(cls, packet: type[Packet]) -> None:
+    def add(cls, packet: type["Packet"]) -> None:
         key = (packet.packet_id, packet.__state__, packet.__direction__)
         if key in cls._packets:
-            msg = f"Duplicate packet: {key}"
-            raise RuntimeError(msg)
+            return
         cls._packets[key] = packet
 
     @classmethod
     def get(
         cls, packet_id: int, state: State, direction: Direction
-    ) -> type[Packet]:
+    ) -> type["Packet"]:
         try:
             return cls._packets[(packet_id, state, direction)]
         except KeyError as error:
