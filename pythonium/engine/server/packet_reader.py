@@ -1,3 +1,4 @@
+import asyncio
 from asyncio import StreamReader
 from collections.abc import AsyncGenerator
 
@@ -18,7 +19,10 @@ class PacketReader:
         data = bytearray()
 
         while True:
-            byte = await self._reader.readexactly(1)
+            try:
+                byte = await self._reader.readexactly(1)
+            except asyncio.IncompleteReadError as error:
+                raise StopAsyncIteration from error
             data.append(byte[0])
 
             value, consumed = VarIntCodec().deserialize(data)
@@ -37,15 +41,27 @@ class PacketReader:
     async def read(
         self, client_session: ClientSession
     ) -> AsyncGenerator[Packet]:
-        packet_data = await self.read_packet()
-        packet_id, _consumed = VarIntCodec().deserialize(packet_data)
+        while True:
+            try:
+                packet_data = await self.read_packet()
+            except (asyncio.IncompleteReadError, StopAsyncIteration):
+                return
 
-        model = get_model_by_id(
-            packet_id=packet_id,
-            state=client_session.state,
-            direction=Direction.SERVERBOUND,
-        )
+            print(packet_data)
 
-        packet = deserialize(model, packet_data)
+            packet_id, consumed = VarIntCodec().deserialize(packet_data)
 
-        yield packet
+            model = get_model_by_id(
+                packet_id=packet_id,
+                state=client_session.state,
+                direction=Direction.SERVERBOUND,
+            )
+
+            if packet_id != model.packet_id:
+                msg = (
+                    f"Packet ID mismatch (expected {model.packet_id}, "
+                    f" got {packet_id})"
+                )
+                raise ValueError(msg)
+
+            yield deserialize(model, packet_data[consumed:])
