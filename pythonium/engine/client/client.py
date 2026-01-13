@@ -1,4 +1,5 @@
-from pythonium.engine.client import ClientConnection, ClientSession
+from pythonium.engine.client.connection import ClientConnection
+from pythonium.engine.client.session import ClientSession
 
 
 class Client:
