@@ -47,8 +47,6 @@ class PacketReader:
             except (asyncio.IncompleteReadError, StopAsyncIteration):
                 return
 
-            print(packet_data)
-
             packet_id, consumed = VarIntCodec().deserialize(packet_data)
 
             model = get_model_by_id(
