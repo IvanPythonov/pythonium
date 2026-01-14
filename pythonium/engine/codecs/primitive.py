@@ -1,4 +1,4 @@
-from pythonium.engine.codecs import PrimitiveCodec
+from pythonium.engine.codecs.base import PrimitiveCodec
 
 
 class BooleanCodec(PrimitiveCodec[bool]):
