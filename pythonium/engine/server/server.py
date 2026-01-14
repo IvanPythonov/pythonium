@@ -48,10 +48,12 @@ class Server(Router):
 
         async for packet in packet_reader.read(client_session=client.session):
             server_packet = await self.route(packet, client=client)
+            print(packet, server_packet)
             if not server_packet:
                 continue
 
             serialized_packet = serialize(server_packet)
+            print(serialized_packet)
 
             await client.connection.write(serialized_packet)
 
