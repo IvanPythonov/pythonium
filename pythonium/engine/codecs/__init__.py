@@ -1,7 +1,28 @@
 """Docstring for pythonium.engine.codecs."""
 
-from .base import Codec, PrimitiveCodec, resolve_codec
-from .custom import StringCodec, VarIntCodec, VarLongCodec
+from .array import (
+    BooleanArrayCodec,
+    ByteArrayCodec,
+    DoubleArrayCodec,
+    FloatArrayCodec,
+    IntArrayCodec,
+    LongArrayCodec,
+    ShortArrayCodec,
+    StringArrayCodec,
+    UnsignedByteArrayCodec,
+    UnsignedShortArrayCodec,
+    UUIDArrayCodec,
+    VarIntArrayCodec,
+    VarLongArrayCodec,
+)
+from .base import ArrayCodec, Codec, PrimitiveCodec, resolve_codec
+from .custom import (
+    PositionCodec,
+    StringCodec,
+    UUIDCodec,
+    VarIntCodec,
+    VarLongCodec,
+)
 from .primitive import (
     BooleanCodec,
     ByteCodec,
@@ -15,19 +36,35 @@ from .primitive import (
 )
 
 __all__ = (
+    "ArrayCodec",
+    "BooleanArrayCodec",
     "BooleanCodec",
+    "ByteArrayCodec",
     "ByteCodec",
     "Codec",
+    "DoubleArrayCodec",
     "DoubleCodec",
+    "FloatArrayCodec",
     "FloatCodec",
+    "IntArrayCodec",
     "IntCodec",
+    "LongArrayCodec",
     "LongCodec",
+    "PositionCodec",
     "PrimitiveCodec",
+    "ShortArrayCodec",
     "ShortCodec",
+    "StringArrayCodec",
     "StringCodec",
+    "UUIDArrayCodec",
+    "UUIDCodec",
+    "UnsignedByteArrayCodec",
     "UnsignedByteCodec",
+    "UnsignedShortArrayCodec",
     "UnsignedShortCodec",
+    "VarIntArrayCodec",
     "VarIntCodec",
+    "VarLongArrayCodec",
     "VarLongCodec",
     "resolve_codec",
 )
