@@ -3,13 +3,13 @@
 from json import dumps
 
 from pythonium.engine import Router
-from pythonium.engine.packets import Ping, Pong, ServerStatus, Status
+from pythonium.engine.packets import GetStatus, Ping, Pong, ServerStatus
 
 router = Router(name=__name__)
 
 
-@router.on(Status)
-async def on_status(_status: Status) -> ServerStatus:
+@router.on(GetStatus)
+async def on_status(_status: GetStatus) -> ServerStatus:
     return ServerStatus(
         json_response=dumps(
             {
