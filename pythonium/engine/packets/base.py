@@ -77,6 +77,7 @@ def deserialize(cls: type[Packet], data: bytes) -> Packet:
 
     for field in cls.fields():
         value, consumed = field.deserialize(data[offset:])
+
         kwargs[field.name] = value
         offset += consumed
 
