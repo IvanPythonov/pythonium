@@ -1,6 +1,8 @@
 import struct
+from uuid import UUID
 
-from pythonium.engine.codecs import Codec
+from pythonium.engine.codecs.base import Codec
+from pythonium.engine.codecs.primitive import LongCodec
 from pythonium.engine.typealiases import Deserialized
 
 SEGMENT_BITS = 0x7F
@@ -82,3 +84,40 @@ class VarLongCodec(VarIntCodec):
     """
 
     __max_bytes__ = 10
+
+
+class UUIDCodec(Codec[str]):
+    """
+    UUID type implementation with Minecraft protocol serialization.
+
+    UUID encoded as a two's complement signed 64-bit integer.
+    """
+
+    def serialize(self, field: str) -> bytes:
+        return UUID(field).int.to_bytes(16, "big")
+
+    def deserialize(self, data: bytes) -> Deserialized[str]:
+        uuid_ = UUID(int=int.from_bytes(data[:16], "big"))
+        return str(uuid_), 16
+
+
+class PositionCodec(Codec[tuple[int, int, int]]):
+    """
+    Position type implementation with Minecraft protocol serialization.
+
+    Encoded as a 64-bit integer where x, y, z coordinates are packed.
+    """
+
+    def serialize(self, field: tuple[int, int, int]) -> bytes:
+        x, y, z = field
+        return LongCodec().serialize(
+            ((x & 0x3FFFFFF) << 38) | ((z & 0x3FFFFFF) << 12) | (y & 0xFFF)
+        )
+
+    def deserialize(self, data: bytes) -> Deserialized[tuple[int, int, int]]:
+        value, consumed = LongCodec().deserialize(data)
+
+        x = value >> 38
+        y = value << 52 >> 52
+        z = value << 26 >> 38
+        return (x, y, z), consumed
