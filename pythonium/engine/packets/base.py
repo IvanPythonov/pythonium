@@ -65,9 +65,12 @@ def serialize(packet: Packet) -> bytes:
 
     data_to_be_sent = VarIntCodec().serialize(packet.packet_id) + payload
 
-    return (
-        VarIntCodec().serialize(len(data_to_be_sent)) + data_to_be_sent
-    )  # HOORAY I FIXED THIS SHIT
+    return VarIntCodec().serialize(len(data_to_be_sent)) + data_to_be_sent
+    # HOORAY, I FIXED IT ALL!
+    # because im a bit stupid and forgot about the packet id
+    # 3 human days were wasted here
+
+    # thanks, God!
 
 
 def deserialize(cls: type[Packet], data: bytes) -> Packet:
