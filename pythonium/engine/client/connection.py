@@ -15,7 +15,6 @@ class ClientConnection:
         self.address: str = self.writer.get_extra_info("peername")[0]
 
     async def write(self, data: bytes) -> None:
-        print(data)
         self.writer.write(data)
         await self.writer.drain()
 
