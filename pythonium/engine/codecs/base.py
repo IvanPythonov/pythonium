@@ -1,48 +1,20 @@
 import struct
-from typing import Annotated, ClassVar, get_args, get_origin
+from abc import ABC
+from typing import Annotated, ClassVar, TypeAliasType, get_args, get_origin
 
 from pythonium.engine.typealiases import Deserialized
 
 
-class Codec[T]:
+class Codec[T](ABC):
     """Class representing codec contract."""
 
-    def serialize(self, data: T) -> bytes:
+    __serializable_type__: ClassVar[type]
+
+    def serialize(self, *, field: T) -> bytes:
         raise NotImplementedError
 
     def deserialize(self, data: bytes) -> Deserialized[T]:
         raise NotImplementedError
-
-
-class ArrayCodec[T](Codec):
-    """Codec for arrays prefixed with length."""
-
-    __element_codec__: ClassVar[Codec]
-    __length_codec__: ClassVar[Codec | None] = None
-
-    def serialize(self, value: list[T]) -> bytes:
-        from pythonium.engine.codecs.custom import VarIntCodec  # noqa: PLC0415
-
-        length_codec = self.__length_codec__ or VarIntCodec()
-        length_bytes = length_codec.serialize(len(value))
-        element_bytes = b"".join(
-            self.__element_codec__.serialize(item) for item in value
-        )
-        return length_bytes + element_bytes
-
-    def deserialize(self, data: bytes) -> Deserialized[list[T]]:
-        from pythonium.engine.codecs.custom import VarIntCodec  # noqa: PLC0415
-
-        length_codec = self.__length_codec__ or VarIntCodec()
-        length, offset = length_codec.deserialize(data)
-        result = []
-
-        for _ in range(length):
-            item, item_size = self.__element_codec__.deserialize(data[offset:])
-            result.append(item)
-            offset += item_size
-
-        return result, offset
 
 
 class PrimitiveCodec[T](Codec[T]):
@@ -59,8 +31,8 @@ class PrimitiveCodec[T](Codec[T]):
             raise NotImplementedError(msg)
         return super().__init_subclass__()
 
-    def serialize(self, data: T) -> bytes:
-        return struct.pack(self.__format_character__, data)
+    def serialize(self, *, field: T) -> bytes:
+        return struct.pack(self.__format_character__, field)
 
     def deserialize(self, data: bytes) -> Deserialized[T]:
         size: int = struct.calcsize(self.__format_character__)
@@ -68,7 +40,9 @@ class PrimitiveCodec[T](Codec[T]):
         return value, size
 
 
-def resolve_codec(annotation: Annotated[object, Codec()]) -> Codec:
+def resolve_codec(annotation: TypeAliasType) -> Codec:
+    annotation = annotation.__value__
+
     if get_origin(annotation) is Annotated:
         args = get_args(annotation)
 

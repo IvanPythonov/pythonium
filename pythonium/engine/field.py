@@ -15,7 +15,7 @@ class Field[T]:
         self.codec = codec
 
     def serialize(self, value: T) -> bytes:
-        return self.codec.serialize(value)
+        return self.codec.serialize(field=value)
 
     def deserialize(self, data: bytes) -> Deserialized[T]:
-        return self.codec.deserialize(data)
+        return self.codec.deserialize(data=data)

@@ -1,96 +1,37 @@
-from pythonium.engine.codecs.base import ArrayCodec
-from pythonium.engine.codecs.custom import (
-    StringCodec,
-    UUIDCodec,
-    VarIntCodec,
-    VarLongCodec,
-)
-from pythonium.engine.codecs.primitive import (
-    BooleanCodec,
-    ByteCodec,
-    DoubleCodec,
-    FloatCodec,
-    IntCodec,
-    LongCodec,
-    ShortCodec,
-    UnsignedByteCodec,
-    UnsignedShortCodec,
-)
+from typing import Any, Final
+
+from pythonium.engine.codecs.base import Codec
+from pythonium.engine.codecs.custom import VarIntCodec
+from pythonium.engine.typealiases import Deserialized
 
 
-class BooleanArrayCodec(ArrayCodec[bool]):
-    """Array of boolean values."""
+class ArrayCodec[T](Codec[list[T]]):
+    """Codec for arrays prefixed with length."""
 
-    __element_codec__ = BooleanCodec()
+    def __init__(
+        self,
+        element_codec: Codec[T],
+        length_codec: Codec[int] | None = None,
+    ) -> None:
+        self._element_codec: Final[Codec[Any]] = element_codec
+        self._length_codec: Final[Codec[Any] | None] = length_codec
 
+    def serialize(self, *, field: list[T]) -> bytes:
+        length_codec = self._length_codec or VarIntCodec()
+        length_bytes = length_codec.serialize(field=len(field))
+        element_bytes = b"".join(
+            self._element_codec.serialize(field=item) for item in field
+        )
+        return length_bytes + element_bytes
 
-class ByteArrayCodec(ArrayCodec[int]):
-    """Array of signed byte values."""
+    def deserialize(self, data: bytes) -> Deserialized[list[T]]:
+        length_codec = self._length_codec or VarIntCodec()
+        length, offset = length_codec.deserialize(data)
+        result: list[T] = []
 
-    __element_codec__ = ByteCodec()
+        for _ in range(length):
+            item, consumed = self._element_codec.deserialize(data[offset:])
+            result.append(item)
+            offset += consumed
 
-
-class UnsignedByteArrayCodec(ArrayCodec[int]):
-    """Array of unsigned byte values."""
-
-    __element_codec__ = UnsignedByteCodec()
-
-
-class ShortArrayCodec(ArrayCodec[int]):
-    """Array of signed short values."""
-
-    __element_codec__ = ShortCodec()
-
-
-class UnsignedShortArrayCodec(ArrayCodec[int]):
-    """Array of unsigned short values."""
-
-    __element_codec__ = UnsignedShortCodec()
-
-
-class IntArrayCodec(ArrayCodec[int]):
-    """Array of signed int values."""
-
-    __element_codec__ = IntCodec()
-
-
-class LongArrayCodec(ArrayCodec[int]):
-    """Array of signed long values."""
-
-    __element_codec__ = LongCodec()
-
-
-class FloatArrayCodec(ArrayCodec[float]):
-    """Array of float values."""
-
-    __element_codec__ = FloatCodec()
-
-
-class DoubleArrayCodec(ArrayCodec[float]):
-    """Array of double values."""
-
-    __element_codec__ = DoubleCodec()
-
-
-class StringArrayCodec(ArrayCodec[str]):
-    """Array of string values."""
-
-    __element_codec__ = StringCodec()
-
-
-class VarIntArrayCodec(ArrayCodec[int]):
-    """Array of VarInt values."""
-
-    __element_codec__ = VarIntCodec()
-
-
-class VarLongArrayCodec(ArrayCodec[int]):
-    """Array of VarLong values."""
-
-    __element_codec__ = VarLongCodec()
-
-
-class UUIDArrayCodec(ArrayCodec[str]):
-    """Array of UUID values."""
-
-    __element_codec__ = UUIDCodec()
+        return result, offset

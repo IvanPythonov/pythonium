@@ -12,9 +12,9 @@ from pythonium.engine.packets import (
     FinishConfiguration,
     KeepAliveConfigurationRequest,
     KeepAliveConfigurationResponse,
+    Login,
     PingConfiguration,
     PongConfiguration,
-    Login,
 )
 
 logger = getLogger(__name__)

@@ -24,7 +24,9 @@ class StringCodec(Codec[str]):
     due to the max size of a valid length VarInt.
     """
 
-    def serialize(self, field: str) -> bytes:
+    __serializable_type__ = str
+
+    def serialize(self, *, field: str) -> bytes:
         return VarIntCodec().serialize(field=len(field)) + field.encode(
             "utf-8"
         )
@@ -42,9 +44,11 @@ class VarIntCodec(Codec[int]):
     Variable-length data encoding a two's complement signed 32-bit integer.
     """
 
+    __serializable_type__ = int
+
     __max_bytes__ = 5
 
-    def serialize(self, field: int) -> bytes:
+    def serialize(self, *, field: int) -> bytes:
         out = b""
         bytes_encountered = 0
 
@@ -93,7 +97,9 @@ class UUIDCodec(Codec[str]):
     UUID encoded as a two's complement signed 64-bit integer.
     """
 
-    def serialize(self, field: str) -> bytes:
+    __serializable_type__ = str
+
+    def serialize(self, *, field: str) -> bytes:
         return UUID(field).int.to_bytes(16, "big")
 
     def deserialize(self, data: bytes) -> Deserialized[str]:
@@ -108,10 +114,14 @@ class PositionCodec(Codec[tuple[int, int, int]]):
     Encoded as a 64-bit integer where x, y, z coordinates are packed.
     """
 
-    def serialize(self, field: tuple[int, int, int]) -> bytes:
+    __serializable_type__ = tuple[int, int, int]
+
+    def serialize(self, *, field: tuple[int, int, int]) -> bytes:
         x, y, z = field
         return LongCodec().serialize(
-            ((x & 0x3FFFFFF) << 38) | ((z & 0x3FFFFFF) << 12) | (y & 0xFFF)
+            field=((x & 0x3FFFFFF) << 38)
+            | ((z & 0x3FFFFFF) << 12)
+            | (y & 0xFFF)
         )
 
     def deserialize(self, data: bytes) -> Deserialized[tuple[int, int, int]]:

@@ -39,8 +39,8 @@ class Login(Packet, kw_only=True):
     is_debug: Boolean
     is_flat: Boolean
     has_death_location: Boolean
-    death_dimension_name: String
-    death_location: Position
+    death_dimension_name: String | None
+    death_location: Position | None
     portal_cooldown: VarInt
     sea_level: VarInt
     enforces_secure_chat: Boolean
