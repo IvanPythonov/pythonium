@@ -15,6 +15,7 @@ from pythonium.engine.codecs import (
 )
 from pythonium.engine.enums import Direction, State
 from pythonium.engine.field import Field
+from pythonium.engine.formatter import format_packet
 from pythonium.engine.packets.packet_storage import PacketStorage
 from pythonium.engine.types import VarInt
 
@@ -51,6 +52,12 @@ class Packet(Struct, kw_only=True):
         if cls.__schema_cache__ is None:
             cls.__schema_cache__ = _build_schema(cls)  # type: ignore[misc, arg-type]
         return cls.__schema_cache__
+
+    def __str__(self) -> str:
+        return format_packet(self)
+
+    def __repr__(self) -> str:
+        return format_packet(self)
 
 
 def _build_schema(cls: type[Packet]) -> list[Field]:
