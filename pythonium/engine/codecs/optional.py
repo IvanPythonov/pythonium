@@ -12,8 +12,8 @@ class OptionalCodec[T](Codec[T | None]):
 
     __serializable_type__ = type(None)
 
-    def __init__(self, element_codec: Codec[T]) -> None:
-        self._element_codec: Final[Codec[Any]] = element_codec
+    def __init__(self, inner_codec: Codec[T]) -> None:
+        self.inner_codec: Final[Codec[Any]] = inner_codec
 
     def serialize(self, *, field: T | None) -> bytes:
         if field is None:
@@ -21,14 +21,14 @@ class OptionalCodec[T](Codec[T | None]):
 
         return _INTERNAL_BOOLEAN_CODEC.serialize(
             field=True
-        ) + self._element_codec.serialize(field=field)
+        ) + self.inner_codec.serialize(field=field)
 
     def deserialize(self, data: bytes) -> Deserialized[T | None]:
         present = data[0] != 0
         offset = 1
 
         if present:
-            value, consumed = self._element_codec.deserialize(data[offset:])
+            value, consumed = self.inner_codec.deserialize(data[offset:])
             return value, offset + consumed
 
         return None, offset
