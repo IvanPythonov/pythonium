@@ -2,6 +2,7 @@ import types
 from typing import Any, ClassVar, TypeAliasType, get_args
 
 from msgspec import Struct
+from msgspec.json import decode, encode
 from msgspec.structs import fields as class_fields
 
 from pythonium.engine.classproperty import ClassProperty
@@ -55,7 +56,7 @@ class Packet(Struct, kw_only=True):
 def _build_schema(cls: type[Packet]) -> list[Field]:
     """Build schema from class fields."""
     if cls.__schema_as_json__:
-        return [Field(name="json", codec=_STRING_CODEC)]
+        return []
 
     schema: list[Field] = []
 
@@ -89,9 +90,14 @@ def serialize(packet: Packet) -> bytes:
     """Serialize packet to bytes."""
     payload = bytearray()
 
-    for field in packet.__schema__:
-        value = getattr(packet, field.name)
-        payload.extend(field.codec.serialize(field=value))
+    if packet.__schema_as_json__:
+        payload.extend(
+            _STRING_CODEC.serialize(field=encode(packet).decode("utf-8"))
+        )
+    else:
+        for field in packet.__schema__:
+            value = getattr(packet, field.name)
+            payload.extend(field.codec.serialize(field=value))
 
     packet_id_bytes = _VARINT_CODEC.serialize(field=packet.packet_id)
     packet_data = packet_id_bytes + payload
@@ -106,8 +112,13 @@ def deserialize[P: Packet](cls: type[P], data: bytes) -> P:
     offset = 0
     kwargs: dict[str, Any] = {}
 
+    if cls.__schema_as_json__:
+        value, _consumed = _STRING_CODEC.deserialize(data[offset:])
+        return decode(value, type=cls)
+
     for field in cls.__schema__:
         value, consumed = field.codec.deserialize(data[offset:])
+
         kwargs[field.name] = value
         offset += consumed
 
