@@ -47,19 +47,20 @@ class Server(Router):
         packet_reader = PacketReader(reader)
 
         async for packet in packet_reader.read(client_session=client.session):
+            logger.info("Received packet with ID %s", hex(packet.packet_id))
+
             server_packet = await self.route(packet, client=client)
 
-            logger.debug(packet, server_packet)
+            logger.debug(packet)
 
             if not server_packet:
                 continue
 
+            logger.debug(server_packet)
+
             serialized_packet = serialize(server_packet)
-            logger.debug(serialized_packet)
 
             await client.connection.write(serialized_packet)
-
-            logger.info("Received packet with ID %s", hex(packet.packet_id))
 
         self.remove_client(client)
         logger.info("Disconnected from %s", addr)
