@@ -27,8 +27,9 @@ class StringCodec(Codec[str]):
     __serializable_type__ = str
 
     def serialize(self, *, field: str) -> bytes:
-        return VarIntCodec().serialize(field=len(field)) + field.encode(
-            "utf-8"
+        encoded_field = field.encode("utf-8")
+        return (
+            VarIntCodec().serialize(field=len(encoded_field)) + encoded_field
         )
 
     def deserialize(self, data: bytes) -> Deserialized[str]:
