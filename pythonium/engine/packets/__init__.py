@@ -14,6 +14,7 @@ from .client.play import Login
 from .client.status import GetStatus, Ping
 from .packet_storage import PacketStorage
 from .server.configuration import (
+    Disconnect,
     FinishConfiguration,
     KeepAliveConfigurationResponse,
     PingConfiguration,
@@ -25,6 +26,7 @@ __all__ = (
     "AcknowledgeFinishConfiguration",
     "ClientInformation",
     "ConfigurationCustomPayload",
+    "Disconnect",
     "FinishConfiguration",
     "GetStatus",
     "Handshake",

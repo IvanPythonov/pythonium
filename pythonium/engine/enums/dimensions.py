@@ -2,8 +2,8 @@ from enum import StrEnum, unique
 
 
 @unique
-class State(StrEnum):
-    """Enum class representing states of a client."""
+class Dimension(StrEnum):
+    """Enum class representing dimensions."""
 
     OVERWORLD = "minecraft:overworld"
     NETHER = "minecraft:nether"

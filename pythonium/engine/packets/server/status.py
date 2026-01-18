@@ -2,6 +2,7 @@ from typing import ClassVar, TypedDict
 
 from pythonium.engine.enums import Direction, State
 from pythonium.engine.packets import Packet
+from pythonium.engine.typealiases import TextComponent
 from pythonium.engine.types import Long, VarInt
 
 
@@ -27,12 +28,6 @@ class PlayersDict(TypedDict):
     sample: list[SamplePlayersDict]
 
 
-class DescriptionDict(TypedDict):
-    """Description dictionary for server status."""
-
-    text: str
-
-
 class ServerStatus(Packet, kw_only=True):
     """Packet representing status."""
 
@@ -45,7 +40,7 @@ class ServerStatus(Packet, kw_only=True):
 
     version: VersionDict
     players: PlayersDict
-    description: DescriptionDict
+    description: TextComponent
 
     favicon: str = "data:image/png;base64,<data>"
     enforcesSecureChat: bool = False  # noqa: N815

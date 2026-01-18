@@ -9,6 +9,7 @@ from pythonium.engine.packets import (
     AcknowledgeFinishConfiguration,
     ClientInformation,
     ConfigurationCustomPayload,
+    Disconnect,
     FinishConfiguration,
     KeepAliveConfigurationRequest,
     KeepAliveConfigurationResponse,
@@ -23,8 +24,8 @@ router = Router(name=__name__)
 
 @router.on(ClientInformation)
 async def on_client_information(
-    _client_information: ClientInformation,
-) -> PingConfiguration:
+    client_information: ClientInformation, client: Client
+) -> PingConfiguration | Disconnect:
     return PingConfiguration(
         id_=secrets.randbelow(2**31 - 1),
     )

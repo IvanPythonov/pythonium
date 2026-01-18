@@ -24,11 +24,24 @@ class KeepAliveConfigurationResponse(Packet, kw_only=True):
     """Packet representing keep alive configuration."""
 
     __state__ = State.CONFIGURATION
-    __direction__ = Direction.SERVERBOUND
+    __direction__ = Direction.CLIENTBOUND
 
     packet_id: ClassVar[VarInt] = 0x04
 
     keep_alive_id: Long
+
+
+class Disconnect(Packet, kw_only=True):
+    """Packet representing disconnect."""
+
+    __schema_as_json__ = True
+
+    __state__ = State.CONFIGURATION
+    __direction__ = Direction.CLIENTBOUND
+
+    packet_id: ClassVar[VarInt] = 0x02
+
+    text: str
 
 
 class FinishConfiguration(Packet, kw_only=True):

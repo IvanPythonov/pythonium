@@ -47,6 +47,7 @@ class Server(Router):
         packet_reader = PacketReader(reader)
 
         async for packet in packet_reader.read(client_session=client.session):
+            print(packet)
             logger.info("Received packet with ID %s", hex(packet.packet_id))
 
             server_packet = await self.route(packet, client=client)
