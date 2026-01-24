@@ -2,7 +2,7 @@ import struct
 from uuid import UUID
 
 from pythonium.engine.codecs.base import Codec
-from pythonium.engine.codecs.primitive import LongCodec
+from pythonium.engine.codecs.primitives import LongCodec
 from pythonium.engine.typealiases import Deserialized
 
 SEGMENT_BITS = 0x7F

@@ -60,6 +60,7 @@ class Server(Router):
             logger.debug(server_packet)
 
             serialized_packet = serialize(server_packet)
+            print(serialized_packet)
 
             await client.connection.write(serialized_packet)
 

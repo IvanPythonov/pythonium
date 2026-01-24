@@ -14,10 +14,16 @@ from pythonium.engine.packets import (
     KeepAliveConfigurationRequest,
     KeepAliveConfigurationResponse,
     Login,
-    Disconnect,
     PingConfiguration,
     PongConfiguration,
 )
+
+from pynbt import TAG_Long, TAG_List, TAG_String
+
+value = {
+    "long_test": TAG_Long(104005),
+    "list_test": TAG_List(TAG_String, ["Timmy", "Billy", "Sally"]),
+}
 
 logger = getLogger(__name__)
 router = Router(name=__name__)
@@ -27,7 +33,22 @@ router = Router(name=__name__)
 async def on_client_information(
     client_information: ClientInformation, client: Client
 ) -> PingConfiguration | Disconnect:
-    return Disconnect(text="1111111111111")
+    client.session.locale = client_information.locale
+    client.session.view_distance = client_information.view_distance
+    client.session.chat_mode = client_information.chat_mode
+    client.session.chat_colors = client_information.chat_colors
+    client.session.displayed_skin_parts = (
+        client_information.displayed_skin_parts
+    )
+    client.session.main_hand = client_information.main_hand
+    client.session.enable_text_filtering = (
+        client_information.enable_text_filtering
+    )
+    client.session.allow_server_listings = (
+        client_information.allow_server_listings
+    )
+    client.session.particle_status = client_information.particle_status
+
     return PingConfiguration(
         id_=secrets.randbelow(2**31 - 1),
     )
@@ -80,8 +101,5 @@ async def on_finish_configuration(
         is_flat=False,
         has_death_location=False,
         portal_cooldown=0,
-        sea_level=63,
         enforces_secure_chat=False,
-        death_dimension_name="minecraft:overworld",
-        death_location=(0, 0, 0),
     )

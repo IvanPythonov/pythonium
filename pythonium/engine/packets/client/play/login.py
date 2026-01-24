@@ -4,6 +4,7 @@ from pythonium.engine.enums import Direction, State
 from pythonium.engine.packets import Packet
 from pythonium.engine.types import (
     Boolean,
+    Byte,
     Int,
     Long,
     Position,
@@ -17,7 +18,7 @@ from pythonium.engine.types import (
 class Login(Packet, kw_only=True):
     """Packet representing login."""
 
-    __state__ = State.LOGIN
+    __state__ = State.PLAY
     __direction__ = Direction.CLIENTBOUND
 
     packet_id: ClassVar[VarInt] = 0x30
@@ -31,16 +32,24 @@ class Login(Packet, kw_only=True):
     reduced_debug_info: Boolean
     enable_respawn_screen: Boolean
     do_limited_crafting: Boolean
+
     dimension_type: VarInt
     dimension_name: String
+
     hashed_seed: Long
+
     game_mode: UByte
-    previous_game_mode: Int
+
+    previous_game_mode: Byte
+
     is_debug: Boolean
+
     is_flat: Boolean
-    has_death_location: Boolean
-    death_dimension_name: String | None
-    death_location: Position | None
+
+    has_death_location: Boolean = False
+    death_dimension_name: String | None = None
+    death_location: Position | None = None
+
     portal_cooldown: VarInt
-    sea_level: VarInt
+
     enforces_secure_chat: Boolean

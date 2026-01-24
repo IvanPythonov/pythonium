@@ -10,3 +10,19 @@ class ClientSession(Struct):
     """Class representing Minecraft client session."""
 
     state: State = State.HANDSHAKING
+
+    locale: str | None = None
+    chat_mode: int | None = None
+    chat_colors: bool | None = None
+
+    enable_text_filtering: bool | None = None
+    allow_server_listings: bool | None = None
+
+    particle_status: int | None = None
+
+    # TODO @IvanPythonov: realize player class  # noqa: FIX002, TD003
+
+    view_distance: int | None = None
+
+    displayed_skin_parts: int | None = None
+    main_hand: int | None = None

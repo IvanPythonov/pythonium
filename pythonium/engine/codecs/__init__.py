@@ -10,7 +10,7 @@ from .custom import (
     VarLongCodec,
 )
 from .optional import OptionalCodec
-from .primitive import (
+from .primitives import (
     BooleanCodec,
     ByteCodec,
     DoubleCodec,

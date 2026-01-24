@@ -1,7 +1,7 @@
 from typing import Any, Final
 
 from pythonium.engine.codecs.base import Codec
-from pythonium.engine.codecs.primitive import BooleanCodec
+from pythonium.engine.codecs.primitives import BooleanCodec
 from pythonium.engine.typealiases import Deserialized
 
 _INTERNAL_BOOLEAN_CODEC = BooleanCodec()
