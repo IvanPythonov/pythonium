@@ -5,6 +5,7 @@ from pythonium.engine.packets import Packet
 from pythonium.engine.types import (
     Int,
     Long,
+    NBTString,
     VarInt,
 )
 
@@ -34,14 +35,12 @@ class KeepAliveConfigurationResponse(Packet, kw_only=True):
 class Disconnect(Packet, kw_only=True):
     """Packet representing disconnect."""
 
-    __schema_as_json__ = True
-
     __state__ = State.CONFIGURATION
     __direction__ = Direction.CLIENTBOUND
 
     packet_id: ClassVar[VarInt] = 0x02
 
-    text: str
+    reason: NBTString
 
 
 class FinishConfiguration(Packet, kw_only=True):

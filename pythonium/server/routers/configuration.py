@@ -18,12 +18,7 @@ from pythonium.engine.packets import (
     PongConfiguration,
 )
 
-from pynbt import TAG_Long, TAG_List, TAG_String
-
-value = {
-    "long_test": TAG_Long(104005),
-    "list_test": TAG_List(TAG_String, ["Timmy", "Billy", "Sally"]),
-}
+value = {"text": "fuck yrself"}
 
 logger = getLogger(__name__)
 router = Router(name=__name__)
@@ -33,6 +28,10 @@ router = Router(name=__name__)
 async def on_client_information(
     client_information: ClientInformation, client: Client
 ) -> PingConfiguration | Disconnect:
+    # Minecraft expects a chat component JSON string for the reason.
+    # Send the JSON-encoded chat component instead of NBT.
+    return Disconnect(reason='{"text": "Invalid client information"}')
+
     client.session.locale = client_information.locale
     client.session.view_distance = client_information.view_distance
     client.session.chat_mode = client_information.chat_mode
