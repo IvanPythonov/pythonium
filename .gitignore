@@ -10,3 +10,4 @@ wheels/
 .venv
 .python_version
 *.lock
+uv.lock

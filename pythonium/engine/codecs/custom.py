@@ -3,6 +3,7 @@ from uuid import UUID
 
 from pythonium.engine.codecs.base import Codec
 from pythonium.engine.codecs.primitives import LongCodec
+from pythonium.engine.exceptions import VarIntDecodeError
 from pythonium.engine.typealiases import Deserialized
 
 SEGMENT_BITS = 0x7F
@@ -61,8 +62,10 @@ class VarIntCodec(Codec[int]):
                 break
             bytes_encountered += 1
             if bytes_encountered > self.__max_bytes__:
-                msg = "Tried to read too long of a VarInt"
-                raise ValueError(msg)
+                raise VarIntDecodeError(
+                    bytes_encountered=bytes_encountered,
+                    __max_bytes__=self.__max_bytes__,
+                )
         return out
 
     def deserialize(self, data: bytes) -> Deserialized[int]:
@@ -76,8 +79,10 @@ class VarIntCodec(Codec[int]):
                 break
 
             if bytes_encountered > self.__max_bytes__:
-                msg = "Tried to read too long of a VarInt"
-                raise ValueError(msg)
+                raise VarIntDecodeError(
+                    bytes_encountered=bytes_encountered,
+                    __max_bytes__=self.__max_bytes__,
+                )
         return number, bytes_encountered
 
 

@@ -6,7 +6,8 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "msgspec>=0.20.0",
-    "pynbt>=3.1.0",
+    "nbtlib>=2.0.4",
+    "winloop>=0.5.0",
 ]
 
 [dependency-groups]

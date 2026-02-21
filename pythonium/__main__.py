@@ -1,7 +1,13 @@
 """Entrypoint."""
 
 import asyncio
+from collections.abc import Callable
+import contextlib
+import importlib
 import logging
+import sys
+from types import ModuleType
+from typing import Any
 
 from pythonium.engine import Server
 from pythonium.server.routers import (
@@ -17,12 +23,33 @@ logging.basicConfig(level=logging.DEBUG)
 async def main() -> None:
     server = Server()
 
-    server.include_routers(
+    server.router.include_routers(
         handshake_router, status_router, login_router, configuration_router
     )
 
     await server.serve()
 
 
+def _setup_asyncio_loop() -> None:
+    logger = logging.getLogger(name=__name__)
+
+    with contextlib.suppress(ImportError):
+        if sys.platform in ("win32", "cygwin"):
+            loop = importlib.import_module("winloop")
+        else:
+            loop = importlib.import_module("uvloop")
+
+        loop.install()
+        return logger.info("Using %s", loop.__name__)
+
+    return logger.info(
+        "Using default asyncio loop. Recommended to "
+        "install `uvloop` (Linux) or"
+        "`winloop` (Windows)"
+    )
+
+
 if __name__ == "__main__":
-    asyncio.run(main())
+    _setup_asyncio_loop()
+
+    asyncio.run(main=main())

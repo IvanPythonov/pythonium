@@ -1,3 +1,4 @@
+import io
 import types
 from typing import Any, ClassVar, TypeAliasType, get_args
 
@@ -5,7 +6,6 @@ from msgspec import Struct
 from msgspec.json import decode, encode
 from msgspec.structs import fields as class_fields
 
-from pythonium.engine.classproperty import ClassProperty
 from pythonium.engine.codecs import (
     Codec,
     OptionalCodec,
@@ -47,10 +47,10 @@ class Packet(Struct, kw_only=True):
 
         PacketStorage.add(packet=cls)
 
-    @ClassProperty[list[Field]]  # type: ignore[arg-type]
-    def __schema__(cls) -> list[Field]:  # noqa: N805
+    @classmethod
+    def get_schema(cls) -> list[Field]:
         if cls.__schema_cache__ is None:
-            cls.__schema_cache__ = _build_schema(cls)  # type: ignore[misc, arg-type]
+            cls.__schema_cache__ = _build_schema(cls)
         return cls.__schema_cache__
 
     def __str__(self) -> str:
@@ -90,28 +90,30 @@ def _resolve_field_codec(
             return OptionalCodec(inner_codec)
         msg = f"Unsupported union type: {field_type}"
         raise TypeError(msg)
+
     return resolve_codec(field_type)
 
 
 def serialize(packet: Packet) -> bytes:
     """Serialize packet to bytes."""
-    payload = bytearray()
+    buffer = io.BytesIO()
+
+    packet_id = _VARINT_CODEC.serialize(field=packet.packet_id)
+    buffer.write(packet_id)
 
     if packet.__schema_as_json__:
-        payload.extend(
-            _STRING_CODEC.serialize(field=encode(packet).decode("utf-8"))
-        )
+        json_bytes = encode(packet)
+
+        buffer.write(_VARINT_CODEC.serialize(field=len(json_bytes)))
+        buffer.write(json_bytes)
     else:
-        for field in packet.__schema__:
+        for field in packet.get_schema():
             value = getattr(packet, field.name)
-            payload.extend(field.codec.serialize(field=value))
+            buffer.write(field.codec.serialize(field=value))
 
-    packet_id_bytes = _VARINT_CODEC.serialize(field=packet.packet_id)
-    packet_data = packet_id_bytes + payload
+    length_bytes = _VARINT_CODEC.serialize(field=buffer.tell())
 
-    length_bytes = _VARINT_CODEC.serialize(field=len(packet_data))
-
-    return length_bytes + packet_data
+    return length_bytes + buffer.getvalue()
 
 
 def deserialize[P: Packet](cls: type[P], data: bytes) -> P:
@@ -123,7 +125,7 @@ def deserialize[P: Packet](cls: type[P], data: bytes) -> P:
         value, _consumed = _STRING_CODEC.deserialize(data[offset:])
         return decode(value, type=cls)
 
-    for field in cls.__schema__:
+    for field in cls.get_schema():
         value, consumed = field.codec.deserialize(data[offset:])
 
         kwargs[field.name] = value

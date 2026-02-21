@@ -1,4 +1,4 @@
-"""Some logic for router."""
+"""Handshake Phase Router."""
 
 from pythonium.engine import Client, Router
 from pythonium.engine.enums import State

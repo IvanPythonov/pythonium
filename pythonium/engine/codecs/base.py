@@ -1,6 +1,12 @@
 import struct
-from abc import ABC
-from typing import Annotated, ClassVar, TypeAliasType, get_args, get_origin
+from abc import ABC, abstractmethod
+from typing import (
+    Annotated,
+    ClassVar,
+    TypeAliasType,
+    get_args,
+    get_origin,
+)
 
 from pythonium.engine.typealiases import Deserialized
 
@@ -10,11 +16,11 @@ class Codec[T](ABC):
 
     __serializable_type__: ClassVar[type]
 
-    def serialize(self, *, field: T) -> bytes:
-        raise NotImplementedError
+    @abstractmethod
+    def serialize(self, *, field: T) -> bytes: ...
 
-    def deserialize(self, data: bytes) -> Deserialized[T]:
-        raise NotImplementedError
+    @abstractmethod
+    def deserialize(self, data: bytes) -> Deserialized[T]: ...
 
 
 class PrimitiveCodec[T](Codec[T]):
@@ -41,7 +47,7 @@ class PrimitiveCodec[T](Codec[T]):
 
 
 def resolve_codec(annotation: TypeAliasType) -> Codec:
-    annotation = annotation.__value__
+    annotation = annotation.evaluate_value()
 
     if get_origin(annotation) is Annotated:
         args = get_args(annotation)

@@ -1,5 +1,6 @@
 import inspect
 from collections.abc import Callable
+from functools import cache
 from typing import Any, Self
 
 from pythonium.engine.packets import Packet
@@ -7,15 +8,30 @@ from pythonium.engine.packets import Packet
 type Handler = Callable[..., Any]
 
 
+@cache
+def _get_func_params(func: Handler) -> set[str]:
+    return set(inspect.signature(func).parameters.keys())
+
+
+def resolve_kwargs(
+    current_kwargs: dict[str, Any], func: Handler
+) -> dict[str, Any]:
+    sig_params = _get_func_params(func)
+
+    return {k: v for k, v in current_kwargs.items() if k in sig_params}
+
+
 class Router:
     """Router can route updates."""
 
-    def __init__(self, *, name: str | None = None, **kwargs: object) -> None:
+    def __init__(
+        self, *, name: str | None = None, **kwargs: dict[str, Any]
+    ) -> None:
         self.name = name or hex(id(self))
 
         self._parent_router: Router | None = None
         self.sub_routers: list[Router] = []
-        self._commands: dict[str, Handler] = {}
+        self._commands: dict[tuple[int, int], Handler] = {}
 
         self._kwargs = kwargs
 
@@ -24,26 +40,19 @@ class Router:
             func: Handler,
         ) -> Handler:
             for command_type in commands_type:
-                self._commands[command_type.__name__] = func
-            return func
-
-        return decorator
-
-    def startup(self) -> Callable[[Handler], Handler]:
-        def decorator(
-            func: Handler,
-        ) -> Handler:
-            self._commands["startup"] = func
+                self._commands[
+                    (command_type.__state__, command_type.packet_id)
+                ] = func
             return func
 
         return decorator
 
     @property
-    def commands(self) -> dict[str, Handler]:
+    def commands(self) -> dict[tuple[int, int], Handler]:
         return self._commands
 
     @property
-    def all_commands(self) -> dict[str, Handler]:
+    def all_commands(self) -> dict[tuple[int, int], Handler]:
         """Get all commands from this router and sub-routers."""
         commands = self._commands.copy()
         for sub_router in self.sub_routers:
@@ -108,20 +117,17 @@ class Router:
         if func is None:
             return None
 
-        sig_params = set(inspect.signature(func).parameters.keys())
+        kwargs = resolve_kwargs(
+            current_kwargs=kwargs | self._kwargs, func=func
+        )
 
-        all_kwargs = {**self._kwargs, **kwargs}
-        function_kwargs = {
-            k: v for k, v in all_kwargs.items() if k in sig_params
-        }
-
-        return await func(packet, **function_kwargs)
+        return await func(packet, **kwargs)
 
     def resolve_router(self, packet: type[Packet]) -> Handler | None:
-        packet_name = packet.__name__
+        packet_id = (packet.__state__, packet.packet_id)
 
-        if packet_name in self._commands:
-            return self._commands[packet_name]
+        if packet_id in self._commands:
+            return self._commands[packet_id]
         return None
 
     def __str__(self) -> str:

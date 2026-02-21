@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING, ClassVar
 
 from pythonium.engine.enums import Direction, State
+from pythonium.engine.exceptions import PacketNotFoundError
 
 if TYPE_CHECKING:
     from pythonium.engine.packets.base import Packet
@@ -25,5 +26,8 @@ class PacketStorage:
         try:
             return cls._packets[(packet_id, state, direction)]
         except KeyError as error:
-            msg = f"Unknown packet {packet_id:#x} in {state}/{direction}"
-            raise ValueError(msg) from error
+            raise PacketNotFoundError(
+                packet_id=f"{packet_id:#04x}",
+                state=state.name,
+                direction=direction.name,
+            ) from error

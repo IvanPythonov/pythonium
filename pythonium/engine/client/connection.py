@@ -1,4 +1,4 @@
-from asyncio import StreamReader, StreamWriter
+from asyncio import StreamReader, StreamWriter, wait_for
 from typing import final
 
 from pythonium.engine.constants import MAX_PACKET_LENGTH
@@ -16,7 +16,7 @@ class ClientConnection:
 
     async def write(self, data: bytes) -> None:
         self.writer.write(data)
-        await self.writer.drain()
+        await wait_for(self.writer.drain(), 15)
 
     async def read(self, n: int | None = None) -> bytes | None:
         return await self.reader.read(n or MAX_PACKET_LENGTH)

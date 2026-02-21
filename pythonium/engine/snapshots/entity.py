@@ -1,7 +1,7 @@
 from msgspec import Struct
 
 from pythonium.engine.enums.dimensions import Dimension
-from pythonium.engine.types import Int, Position
+from pythonium.engine.types import Int, NBTCompound, Position
 
 
 class EntitySnapshot(Struct, kw_only=True):
@@ -13,4 +13,4 @@ class EntitySnapshot(Struct, kw_only=True):
     x_rotation: Int
     y_rotation: Int
     dimension: Dimension
-    nbt_tags: dict
+    nbt_tags: NBTCompound

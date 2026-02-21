@@ -21,7 +21,7 @@ class Login(Packet, kw_only=True):
     __state__ = State.PLAY
     __direction__ = Direction.CLIENTBOUND
 
-    packet_id: ClassVar[VarInt] = 0x30
+    packet_id: ClassVar = 0x2B
 
     entity_id: Int
     is_hardcore: Boolean
@@ -31,19 +31,15 @@ class Login(Packet, kw_only=True):
     simulation_distance: VarInt
     reduced_debug_info: Boolean
     enable_respawn_screen: Boolean
+
     do_limited_crafting: Boolean
-
     dimension_type: VarInt
+
     dimension_name: String
-
     hashed_seed: Long
-
     game_mode: UByte
-
     previous_game_mode: Byte
-
     is_debug: Boolean
-
     is_flat: Boolean
 
     has_death_location: Boolean = False
@@ -51,5 +47,3 @@ class Login(Packet, kw_only=True):
     death_location: Position | None = None
 
     portal_cooldown: VarInt
-
-    enforces_secure_chat: Boolean

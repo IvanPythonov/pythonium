@@ -1,6 +1,6 @@
 from pythonium.engine.enums.dimensions import Dimension
 from pythonium.engine.snapshots.entity import EntitySnapshot
-from pythonium.engine.types import Int, Position
+from pythonium.engine.types import NBTCompound, Int, Position
 
 
 class Entity:
@@ -16,7 +16,7 @@ class Entity:
         entity_id: Int,
         position_data: tuple[Position, Position, Dimension],
         rotation: tuple[Int, Int] = (0, 0),
-        nbt_tags: dict | None = None,
+        nbt_tags: NBTCompound | None = None,
     ) -> None:
         if nbt_tags is None:
             nbt_tags = {}

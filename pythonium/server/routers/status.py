@@ -1,4 +1,4 @@
-"""Some logic for router."""
+"""Status Phase Router."""
 
 from pythonium.engine import Router
 from pythonium.engine.packets import GetStatus, Ping, Pong, ServerStatus
