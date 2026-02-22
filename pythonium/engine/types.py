@@ -20,7 +20,13 @@ from pythonium.engine.codecs import (
     VarLongCodec,
 )
 from pythonium.engine.codecs.array import ArrayCodec
+from pythonium.engine.codecs.custom import TextComponentCodec
+from pythonium.engine.codecs.game_codecs import (
+    ModifierDataCodec,
+    ModifierDataStruct,
+)
 from pythonium.engine.codecs.optional import OptionalCodec
+from pythonium.engine.codecs.slot import SlotCodec, SlotStruct
 
 type VarInt = Annotated[int, VarIntCodec()]
 type VarLong = Annotated[int, VarLongCodec()]
@@ -77,4 +83,11 @@ type NBTCompound = Annotated[dict[str, BaseTag], NBTCodec()]
 
 type Identifier = Annotated[
     str, StringCodec()
-]  # TODO(IvanPythonov): Create IdentifierCodec WITH VALIDATION  # noqa: FIX002
+]  # TODO(IvanPythonov): Create IdentifierCodec WITH VALIDATION
+
+type TextComponent = Annotated[NBTCompound, TextComponentCodec()]
+type ModifierData = Annotated[ModifierDataStruct, ModifierDataCodec()]
+
+type Slot = Annotated[SlotStruct, SlotCodec()]
+
+type SlotArray = Annotated[list[SlotStruct], ArrayCodec(SlotCodec())]

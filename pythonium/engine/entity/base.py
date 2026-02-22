@@ -1,6 +1,6 @@
 from pythonium.engine.enums.dimensions import Dimension
 from pythonium.engine.snapshots.entity import EntitySnapshot
-from pythonium.engine.types import NBTCompound, Int, Position
+from pythonium.engine.types import Int, NBTCompound, Position
 
 
 class Entity:

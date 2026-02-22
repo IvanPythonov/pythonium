@@ -9,10 +9,10 @@ from pythonium.engine.codecs.optional import OptionalCodec
 from pythonium.engine.enums import Direction, State
 from pythonium.engine.packets import Packet
 from pythonium.engine.types import (
-    NBTCompound,
     Identifier,
     Int,
     Long,
+    NBTCompound,
     VarInt,
 )
 

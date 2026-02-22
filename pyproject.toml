@@ -37,6 +37,9 @@ ignore = [
     "TC001", # typing-only-first-party-import
     "TC003", # typing-only-standard-library-import
     "RUF001",  # ambiguous-unicode-character-string
+    "TD002", # missing-todo-author
+    "TD003", # missing-todo-link
+    "FIX002", # line-contains-todo
 ]
 select = ["ALL"]
 fixable = ["ALL"]

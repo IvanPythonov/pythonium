@@ -20,7 +20,7 @@ class ClientSession(Struct):
 
     particle_status: int | None = None
 
-    # TODO @IvanPythonov: realize player class  # noqa: FIX002, TD003
+    # TODO @IvanPythonov: realize player class
 
     view_distance: int | None = None
 

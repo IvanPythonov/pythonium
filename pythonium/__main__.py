@@ -1,13 +1,10 @@
 """Entrypoint."""
 
 import asyncio
-from collections.abc import Callable
 import contextlib
 import importlib
 import logging
 import sys
-from types import ModuleType
-from typing import Any
 
 from pythonium.engine import Server
 from pythonium.server.routers import (
@@ -16,6 +13,7 @@ from pythonium.server.routers import (
     login_router,
     status_router,
 )
+from pythonium.server.routers.play import router as play_router
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -24,7 +22,11 @@ async def main() -> None:
     server = Server()
 
     server.router.include_routers(
-        handshake_router, status_router, login_router, configuration_router
+        handshake_router,
+        status_router,
+        login_router,
+        configuration_router,
+        play_router,
     )
 
     await server.serve()

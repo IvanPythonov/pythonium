@@ -2,6 +2,7 @@ import struct
 from uuid import UUID
 
 from pythonium.engine.codecs.base import Codec
+from pythonium.engine.codecs.nbt import NBTCodec
 from pythonium.engine.codecs.primitives import LongCodec
 from pythonium.engine.exceptions import VarIntDecodeError
 from pythonium.engine.typealiases import Deserialized
@@ -64,7 +65,7 @@ class VarIntCodec(Codec[int]):
             if bytes_encountered > self.__max_bytes__:
                 raise VarIntDecodeError(
                     bytes_encountered=bytes_encountered,
-                    __max_bytes__=self.__max_bytes__,
+                    max_bytes=self.__max_bytes__,
                 )
         return out
 
@@ -81,7 +82,7 @@ class VarIntCodec(Codec[int]):
             if bytes_encountered > self.__max_bytes__:
                 raise VarIntDecodeError(
                     bytes_encountered=bytes_encountered,
-                    __max_bytes__=self.__max_bytes__,
+                    max_bytes=self.__max_bytes__,
                 )
         return number, bytes_encountered
 
@@ -137,3 +138,20 @@ class PositionCodec(Codec[tuple[int, int, int]]):
         y = value << 52 >> 52
         z = value << 26 >> 38
         return (x, y, z), consumed
+
+
+class TextComponentCodec(Codec[dict]):
+    """
+    Codec for Text Components.
+
+    In protocol 772 (1.21.x), Text Components are serialized as Network NBT.
+    """
+
+    __serializable_type__ = dict
+
+    def serialize(self, *, field: dict) -> bytes:
+        return NBTCodec().serialize(field=field)
+
+    def deserialize(self, data: bytes) -> Deserialized[dict]:
+        value, consumed = NBTCodec().deserialize(data)
+        return value, consumed

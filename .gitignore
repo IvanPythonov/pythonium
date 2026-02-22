@@ -11,3 +11,5 @@ wheels/
 .python_version
 *.lock
 uv.lock
+
+.vscode

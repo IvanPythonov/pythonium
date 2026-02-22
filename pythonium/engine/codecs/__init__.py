@@ -5,10 +5,12 @@ from .base import Codec, PrimitiveCodec, resolve_codec
 from .custom import (
     PositionCodec,
     StringCodec,
+    TextComponentCodec,
     UUIDCodec,
     VarIntCodec,
     VarLongCodec,
 )
+from .game_codecs import ModifierDataCodec, ModifierDataStruct
 from .nbt import (
     NBTCodec,
 )
@@ -24,6 +26,7 @@ from .primitives import (
     UnsignedByteCodec,
     UnsignedShortCodec,
 )
+from .slot import SlotCodec
 
 __all__ = (
     "ArrayCodec",
@@ -35,12 +38,16 @@ __all__ = (
     "FloatCodec",
     "IntCodec",
     "LongCodec",
+    "ModifierDataCodec",
+    "ModifierDataStruct",
     "NBTCodec",
     "OptionalCodec",
     "PositionCodec",
     "PrimitiveCodec",
     "ShortCodec",
+    "SlotCodec",
     "StringCodec",
+    "TextComponentCodec",
     "UUIDCodec",
     "UnsignedByteCodec",
     "UnsignedShortCodec",
