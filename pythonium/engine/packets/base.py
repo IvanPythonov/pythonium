@@ -1,5 +1,6 @@
 import io
 import types
+from enum import Enum
 from typing import Any, ClassVar, TypeAliasType, get_args
 
 from msgspec import Struct
@@ -72,13 +73,14 @@ def _build_schema(cls: type[Packet]) -> list[Field]:
             continue
 
         codec = _resolve_field_codec(field.type)
+
         schema.append(Field(name=field.name, codec=codec))
 
     return schema
 
 
 def _resolve_field_codec(
-    field_type: TypeAliasType | types.UnionType,
+    field_type: TypeAliasType | types.UnionType | type[Enum],
 ) -> Codec[Any]:
     """Resolve codec for field, wrapping in OptionalCodec if needed."""
     if isinstance(field_type, types.UnionType):
@@ -90,6 +92,12 @@ def _resolve_field_codec(
             return OptionalCodec(inner_codec)
         msg = f"Unsupported union type: {field_type}"
         raise TypeError(msg)
+
+    if isinstance(field_type, type) and issubclass(field_type, Enum):
+        if hasattr(field_type, "__codec__"):
+            return field_type.__codec__
+        msg = f"{field_type.__name__} used Enum, but doesn't have `__codec__`."
+        raise NotImplementedError(msg)
 
     return resolve_codec(field_type)
 

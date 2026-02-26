@@ -26,8 +26,6 @@ class StringCodec(Codec[str]):
     due to the max size of a valid length VarInt.
     """
 
-    __serializable_type__ = str
-
     def serialize(self, *, field: str) -> bytes:
         encoded_field = field.encode("utf-8")
         return (
@@ -46,8 +44,6 @@ class VarIntCodec(Codec[int]):
 
     Variable-length data encoding a two's complement signed 32-bit integer.
     """
-
-    __serializable_type__ = int
 
     __max_bytes__ = 5
 
@@ -104,8 +100,6 @@ class UUIDCodec(Codec[str]):
     UUID encoded as a two's complement signed 64-bit integer.
     """
 
-    __serializable_type__ = str
-
     def serialize(self, *, field: str) -> bytes:
         return UUID(field).int.to_bytes(16, "big")
 
@@ -120,8 +114,6 @@ class PositionCodec(Codec[tuple[int, int, int]]):
 
     Encoded as a 64-bit integer where x, y, z coordinates are packed.
     """
-
-    __serializable_type__ = tuple[int, int, int]
 
     def serialize(self, *, field: tuple[int, int, int]) -> bytes:
         x, y, z = field
@@ -146,8 +138,6 @@ class TextComponentCodec(Codec[dict]):
 
     In protocol 772 (1.21.x), Text Components are serialized as Network NBT.
     """
-
-    __serializable_type__ = dict
 
     def serialize(self, *, field: dict) -> bytes:
         return NBTCodec().serialize(field=field)

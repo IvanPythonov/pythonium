@@ -19,8 +19,6 @@ class SlotStruct(Struct):
 class SlotCodec(Codec[SlotStruct]):
     """Codec for the Slot type."""
 
-    __serializable_type__ = SlotStruct
-
     def __init__(self) -> None:
         self.varint_codec = VarIntCodec()
 

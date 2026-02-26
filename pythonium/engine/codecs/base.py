@@ -1,8 +1,8 @@
 import struct
 from abc import ABC, abstractmethod
+from functools import cache
 from typing import (
     Annotated,
-    ClassVar,
     TypeAliasType,
     get_args,
     get_origin,
@@ -13,8 +13,6 @@ from pythonium.engine.typealiases import Deserialized
 
 class Codec[T](ABC):
     """Class representing codec contract."""
-
-    __serializable_type__: ClassVar[type]
 
     @abstractmethod
     def serialize(self, *, field: T) -> bytes: ...
@@ -46,6 +44,7 @@ class PrimitiveCodec[T](Codec[T]):
         return value, size
 
 
+@cache
 def resolve_codec(annotation: TypeAliasType) -> Codec:
     annotation = annotation.evaluate_value()
 

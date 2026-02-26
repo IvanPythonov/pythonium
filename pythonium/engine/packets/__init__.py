@@ -45,8 +45,6 @@ from .client.play import (
     SetBeaconEffect,
     SetPlayerMovementFlags,
     SetPlayerPosition,
-    SetPlayerPositionAndRotation,
-    SetPlayerRotation,
     SetSeenRecipe,
     SetTestBlock,
     SwingArm,

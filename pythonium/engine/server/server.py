@@ -1,5 +1,10 @@
 import socket
-from asyncio import StreamReader, StreamWriter, start_server
+from asyncio import (
+    StreamReader,
+    StreamWriter,
+    gather,
+    start_server,
+)
 from collections.abc import Iterable, Sized
 from logging import getLogger
 
@@ -7,7 +12,10 @@ from pythonium.engine import Client, Router
 from pythonium.engine.client import ClientConnection, ClientSession
 from pythonium.engine.enums import State
 from pythonium.engine.packets import serialize
+from pythonium.engine.properties_reader import get_properties
 from pythonium.engine.server import PacketReader
+from pythonium.engine.ticker.ticker import Ticker
+from pythonium.engine.world import World
 
 logger = getLogger(__name__)
 
@@ -15,13 +23,13 @@ logger = getLogger(__name__)
 class Server:
     """Class representing Minecraft server."""
 
-    def __init__(
-        self, host: str = "127.0.0.1", port: int = 25565, **kwargs: object
-    ) -> None:
+    def __init__(self, **kwargs: object) -> None:
         self._clients: list[Client] = []
 
-        self.host = host
-        self.port = port
+        self.properties = get_properties(path="properties.toml")
+
+        self.world = World()
+        self.ticker = Ticker(world=self.world)
 
         self.router = Router(name=self.__class__.__name__, kwargs=kwargs)
 
@@ -38,18 +46,12 @@ class Server:
         self, reader: StreamReader, writer: StreamWriter
     ) -> None:
         """Handle a new client connection."""
-        client_socket = writer.get_extra_info("socket")
+        client_socket: socket.socket = writer.get_extra_info("socket")
+
         if client_socket is not None:
             client_socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 
-            client_socket.setsockopt(
-                socket.SOL_SOCKET, socket.SO_RCVBUF, 65536
-            )
-            client_socket.setsockopt(
-                socket.SOL_SOCKET, socket.SO_SNDBUF, 65536
-            )
-
-        address = writer.get_extra_info("peername")[0]
+        address: str = writer.get_extra_info("peername")[0]
         logger.info("New connection from %s", address)
 
         client = Client(
@@ -65,7 +67,13 @@ class Server:
                 "Received packet with ID %s", f"{packet.packet_id:#04x}"
             )
 
-            server_packet = await self.router.route(packet, client=client)
+            server_packet = await self.router.route(
+                packet,
+                client=client,
+                ticker=self.ticker,
+                properties=self.properties,
+                world=self.world,
+            )
 
             logger.debug(packet)
 
@@ -84,27 +92,27 @@ class Server:
                 )
 
                 for packet_ in server_packet:
-                    serialized_packet = serialize(packet_)
-                    logger.debug(serialized_packet)
-
-                    await client.connection.write(serialized_packet)
+                    await client.connection.write(serialize(packet_))
 
             else:
-                serialized_packet = serialize(server_packet)
-                logger.debug(serialized_packet)
-
-                await client.connection.write(serialized_packet)
+                await client.connection.write(serialize(server_packet))
 
         self.remove_client(client)
         logger.info("Disconnected from %s", address)
         await client.connection.disconnect()
 
     async def serve(self) -> None:
-        server = await start_server(
-            self._handle_connection, self.host, self.port
+        logger.info(
+            "Serving on %s:%s",
+            self.properties.server.host,
+            self.properties.server.port,
         )
 
-        logger.info("Serving on %s:%s", self.host, self.port)
+        ticker = self.ticker.run()
+        server = start_server(
+            self._handle_connection,
+            self.properties.server.host,
+            self.properties.server.port,
+        )
 
-        async with server:
-            await server.serve_forever()
+        await gather(ticker, server)

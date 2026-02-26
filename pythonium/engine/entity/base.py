@@ -6,8 +6,10 @@ from pythonium.engine.types import Int, NBTCompound, Position
 class Entity:
     """Base class for an entity."""
 
+    __snapshot__: EntitySnapshot
+
     def __init_subclass__(cls) -> None:
-        if not hasattr(cls, "snapshot"):
+        if not hasattr(cls, "__snapshot__"):
             msg = f"{cls.__name__} must define `snapshot`"
             raise NotImplementedError(msg)
 
@@ -29,7 +31,7 @@ class Entity:
         self.y_rotation = rotation[1]
         self.velocity: Position = velocity
         self.entity_location: Position = entity_location
-        self.nbt_tags = nbt_tags
+        self.nbt_tags: NBTCompound | None = nbt_tags
 
     def move(
         self,

@@ -8,7 +8,6 @@ class BooleanCodec(PrimitiveCodec[bool]):
     True is encoded as 0x01, false as 0x00.
     """
 
-    __serializable_type__ = bool
     __format_character__ = "?"
 
 
@@ -19,7 +18,6 @@ class ByteCodec(PrimitiveCodec[int]):
     Signed 8-bit integer, two's complement.
     """
 
-    __serializable_type__ = int
     __format_character__ = ">b"
 
 
@@ -30,7 +28,6 @@ class UnsignedByteCodec(PrimitiveCodec[int]):
     Unsigned 8-bit integer.
     """
 
-    __serializable_type__ = int
     __format_character__ = ">B"
 
 
@@ -41,7 +38,6 @@ class ShortCodec(PrimitiveCodec[int]):
     Signed 16-bit integer, two's complement.
     """
 
-    __serializable_type__ = int
     __format_character__ = ">h"
 
 
@@ -52,7 +48,6 @@ class UnsignedShortCodec(PrimitiveCodec[int]):
     Unsigned 16-bit integer.
     """
 
-    __serializable_type__ = int
     __format_character__ = ">H"
 
 
@@ -63,7 +58,6 @@ class IntCodec(PrimitiveCodec[int]):
     Signed 32-bit integer, two's complement.
     """
 
-    __serializable_type__ = int
     __format_character__ = ">i"
 
 
@@ -74,7 +68,6 @@ class LongCodec(PrimitiveCodec[int]):
     Signed 64-bit integer, two's complement.
     """
 
-    __serializable_type__ = int
     __format_character__ = ">q"
 
 
@@ -85,7 +78,6 @@ class FloatCodec(PrimitiveCodec[float]):
     A single-precision 32-bit IEEE 754 floating point number
     """
 
-    __serializable_type__ = float
     __format_character__ = ">f"
 
 
@@ -96,5 +88,4 @@ class DoubleCodec(PrimitiveCodec[float]):
     A double-precision 64-bit IEEE 754 floating point number.
     """
 
-    __serializable_type__ = float
     __format_character__ = ">d"

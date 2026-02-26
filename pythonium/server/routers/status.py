@@ -2,16 +2,26 @@
 
 from pythonium.engine import Router
 from pythonium.engine.packets import GetStatus, Ping, Pong, ServerStatus
+from pythonium.engine.properties_reader import Properties
 
 router = Router(name=__name__)
 
+PROTOCOL_VERSION = {
+    "1.21.8": 772,
+}
+
 
 @router.on(GetStatus)
-async def on_status(_status: GetStatus) -> ServerStatus:
+async def on_status(
+    _status: GetStatus, properties: Properties
+) -> ServerStatus:
     return ServerStatus(
-        version={"name": "1.21.8", "protocol": 772},
+        version={
+            "name": properties.server.version,
+            "protocol": PROTOCOL_VERSION[properties.server.version],
+        },
         players={
-            "max": 100,
+            "max": properties.server.max_players,
             "online": 1,
             "sample": [
                 {
@@ -20,7 +30,7 @@ async def on_status(_status: GetStatus) -> ServerStatus:
                 }
             ],
         },
-        description={"text": "Hello, world!"},
+        description={"text": properties.server.motd},
     )
 
 

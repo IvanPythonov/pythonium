@@ -1,4 +1,5 @@
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
+from typing import Any, cast
 
 from pythonium.engine.codecs.base import Codec
 from pythonium.engine.codecs.custom import VarIntCodec
@@ -6,6 +7,8 @@ from pythonium.engine.typealiases import Deserialized
 
 
 class ArrayCodec[T](Codec[list[T]]):
+    """Codec for list/array types."""
+
     def __init__(
         self,
         element_codec: Codec | Sequence[Codec],
@@ -13,23 +16,29 @@ class ArrayCodec[T](Codec[list[T]]):
     ) -> None:
         self.length_codec = length_codec or VarIntCodec()
 
+        self.codecs: Sequence[Codec] | None
+        self.single: Codec | None
+
         if isinstance(element_codec, (list, tuple)):
             self.codecs = element_codec
             self.single = None
         else:
             self.codecs = None
-            self.single = element_codec
+            self.single = element_codec  # ignore: type[assignment]
 
     def serialize(self, field: list[T]) -> bytes:
         chunks = [self.length_codec.serialize(field=len(field))]
 
         if self.codecs:
             for item in field:
-                for codec, sub_item in zip(self.codecs, item, strict=False):
+                iterable_item = cast("Iterable[Any]", item)
+
+                for codec, sub_item in zip(
+                    self.codecs, iterable_item, strict=False
+                ):
                     chunks.append(codec.serialize(field=sub_item))
-        else:
-            for item in field:
-                chunks.append(self.single.serialize(field=item))
+        elif self.single:
+            chunks.extend(self.single.serialize(field=item) for item in field)
 
         return b"".join(chunks)
 
@@ -44,10 +53,10 @@ class ArrayCodec[T](Codec[list[T]]):
                     val, consumed = codec.deserialize(data[offset:])
                     row.append(val)
                     offset += consumed
-                result.append(tuple(row))
-            else:
+                result.append(tuple(row))  # type: ignore[arg-type]
+            elif self.single:
                 val, consumed = self.single.deserialize(data[offset:])
                 result.append(val)
                 offset += consumed
 
-        return result, offset
+        return result, offset  # type: ignore[return-value]

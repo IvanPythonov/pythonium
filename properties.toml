@@ -1,0 +1,49 @@
+[server]
+# message on the multiplayer screen (MOTD)
+motd = "Hello world :3 | 1000-7"
+# max homies allowed in the lobby
+max-players = 123
+# actually, server supports only 1.21.8
+version = "1.21.8"
+# "0.0.0.0" to let the whole squad pull up, "127.0.0.1" if you're just testing solo (lonely arc)
+host = "127.0.0.1"
+# default port. where we dropping?
+port = 25565
+
+[auth]
+# true = premium chads only (Mojang auth required)
+# false = cracked mode/offline mode. kinda sus, anyone can log in as you
+online-mode = false
+# anti-ddos delay for connections (in ms). Keeps the server from crashing when bots try to spam join
+connection-throttle = 500
+
+[world]
+# survival (based), creative (flexing builds), adventure (questing), spectator (ghost mode)
+gamemode = "survival"
+# peaceful (for the normies), easy, normal, hard
+difficulty = "normal"
+# world seed. Leave it empty ("") to let rngesus cook, or paste your god seed here
+seed = ""
+# hardcore mode. (perma-spectator, no respawn fr fr)
+hardcore = false
+
+[performance]
+# how many chunks render around a player. 10 is chill, 32 will make your cpu exit the chat
+view-distance = 10
+# the distance where mobs actually have brain cells. outside this, they stand still like npcs
+simulation-distance = 8
+# target ticks per second. if this drops below 20, the server is fighting for its life
+target-tps = 20
+
+[network]
+# compression threshold in bytes. 256 is the sweet spot
+# lower = eats your cpu, higher = hogs bandwidth
+compression-threshold = 256
+# max packet size in bytes. prevents script kiddies from crashing the server with a comically large packet
+max-packet-size = 2097151
+
+[chat]
+# allow players to use § to make their chat text look fancy
+allow-colors = true
+# true = kicks kids who are yapping/spamming the chat
+prevent-spam = true

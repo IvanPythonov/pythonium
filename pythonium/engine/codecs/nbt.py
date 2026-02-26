@@ -21,8 +21,6 @@ class NBTCodec(Codec[Compound]):
         Chunk data (see Region Files)
     """
 
-    __serializable_type__ = Compound
-
     def serialize(self, *, field: Compound) -> bytes:
         buffer = io.BytesIO()
         file = File(field, gzipped=False)
@@ -37,4 +35,9 @@ class NBTCodec(Codec[Compound]):
 
         return data
 
-    def deserialize(self, data: bytes) -> Deserialized[Compound]: ...
+    def deserialize(self, data: bytes) -> Deserialized[Compound]:
+        buffer = io.BytesIO(data)
+
+        value = Compound.parse(buffer)
+
+        return value, buffer.tell()

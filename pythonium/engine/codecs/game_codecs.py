@@ -1,5 +1,3 @@
-from typing import Any
-
 from msgspec import Struct
 
 from pythonium.engine.codecs.base import Codec
@@ -18,8 +16,6 @@ class ModifierDataStruct(Struct):
 
 class ModifierDataCodec(Codec[ModifierDataStruct]):
     """Codec for Attribute Modifier Data."""
-
-    __serializable_type__ = ModifierDataStruct
 
     def __init__(self) -> None:
         self.string_codec = StringCodec()

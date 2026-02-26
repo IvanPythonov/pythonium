@@ -26,8 +26,6 @@ class DebugPayload(Struct):
 class DebugPayloadCodec(Codec[DebugPayload]):
     """Debug payload codec."""
 
-    __serializable_type__ = DebugPayload
-
     def __init__(self) -> None:
         self.varint_codec = VarIntCodec()
         self.pos_codec = PositionCodec()
@@ -58,7 +56,7 @@ class DebugPayloadCodec(Codec[DebugPayload]):
                 travel, c3 = self.varint_codec.deserialize(
                     remaining_data[c1 + c2 :]
                 )
-                blacklist, c4 = ArrayCodec(self.pos_codec).deserialize(
+                blacklist, c4 = ArrayCodec(self.pos_codec).deserialize(  # type: ignore[var-annotated]
                     remaining_data[c1 + c2 + c3 :]
                 )
 

@@ -10,8 +10,6 @@ _INTERNAL_BOOLEAN_CODEC = BooleanCodec()
 class OptionalCodec[T](Codec[T | None]):
     """A field of type X, or nothing."""
 
-    __serializable_type__ = type(None)
-
     def __init__(self, inner_codec: Codec[T]) -> None:
         self.inner_codec: Final[Codec[Any]] = inner_codec
 

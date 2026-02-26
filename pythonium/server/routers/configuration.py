@@ -15,6 +15,7 @@ from nbtlib import (
 
 from pythonium.engine import Client, Router
 from pythonium.engine.enums import State
+from pythonium.engine.enums.teleport_flags import TeleportFlags
 from pythonium.engine.packets import (
     AcknowledgeFinishConfiguration,
     ClientInformation,
@@ -26,6 +27,8 @@ from pythonium.engine.packets import (
     PingConfiguration,
     PongConfiguration,
     RegistryData,
+    SetDefaultSpawnPosition,
+    SynchronizePlayerPosition,
 )
 from pythonium.engine.packets.base import Packet
 
@@ -373,26 +376,44 @@ async def on_payload(
 @router.on(AcknowledgeFinishConfiguration)
 async def on_finish_configuration(
     _payload: AcknowledgeFinishConfiguration, client: Client
-) -> Login:
+) -> tuple[Packet, ...]:
     client.session.state = State.PLAY
 
-    return Login(
-        entity_id=1,
-        is_hardcore=False,
-        dimension_names=["minecraft:overworld"],
-        max_players=100,
-        view_distance=10,
-        simulation_distance=10,
-        reduced_debug_info=False,
-        enable_respawn_screen=True,
-        do_limited_crafting=False,
-        dimension_type=0,
-        dimension_name="minecraft:overworld",
-        hashed_seed=0,
-        game_mode=0,
-        previous_game_mode=-1,
-        is_debug=False,
-        is_flat=False,
-        has_death_location=False,
-        portal_cooldown=0,
+    return (
+        Login(
+            entity_id=1,
+            is_hardcore=False,
+            dimension_names=["minecraft:overworld"],
+            max_players=100,
+            view_distance=10,
+            simulation_distance=10,
+            reduced_debug_info=False,
+            enable_respawn_screen=True,
+            do_limited_crafting=False,
+            dimension_type=0,
+            dimension_name="minecraft:overworld",
+            hashed_seed=0,
+            game_mode=0,
+            previous_game_mode=-1,
+            is_debug=False,
+            is_flat=False,
+            has_death_location=False,
+            portal_cooldown=0,
+        ),
+        SetDefaultSpawnPosition(
+            spawn_position=(0, 10, 0),
+            angle=0.0,
+        ),
+        SynchronizePlayerPosition(
+            teleport_id=0,
+            x=0,
+            y=10,
+            z=10,
+            velocity_x=0.0,
+            velocity_y=0.0,
+            velocity_z=0.0,
+            yaw=0.0,
+            pitch=0.0,
+            flags=TeleportFlags.relative_pitch,
+        ),
     )

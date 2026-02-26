@@ -1,6 +1,6 @@
-from typing import Any, ClassVar
+from typing import ClassVar
 
-from pythonium.engine.enums import Direction, State
+from pythonium.engine.enums import Direction, State, TeleportFlags
 from pythonium.engine.packets.base import Packet
 from pythonium.engine.types import Double, Float, VarInt
 
@@ -11,7 +11,7 @@ class SynchronizePlayerPosition(Packet, kw_only=True):
     __state__ = State.PLAY
     __direction__ = Direction.CLIENTBOUND
 
-    packet_id: ClassVar[VarInt] = 0x46
+    packet_id: ClassVar[VarInt] = 0x41
 
     teleport_id: VarInt
     """
@@ -43,5 +43,5 @@ class SynchronizePlayerPosition(Packet, kw_only=True):
     pitch: Float
     """Float - Absolute or relative rotation on the Y axis, in degrees."""
 
-    flags: Any  # TODO: Teleport Flags
+    flags: TeleportFlags
     """Teleport Flags"""

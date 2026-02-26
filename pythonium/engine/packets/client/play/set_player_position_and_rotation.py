@@ -16,7 +16,7 @@ class SetPlayerPositionAndRotation(Packet, kw_only=True):
     x: Double
     """Double - Absolute position."""
 
-    feet_y: Double
+    y: Double
     """Double - Absolute feet position, normally Head Y - 1.62."""
 
     z: Double
