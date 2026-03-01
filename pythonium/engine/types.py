@@ -20,7 +20,10 @@ from pythonium.engine.codecs import (
     VarLongCodec,
 )
 from pythonium.engine.codecs.array import ArrayCodec
-from pythonium.engine.codecs.custom import TextComponentCodec
+from pythonium.engine.codecs.custom import (
+    JsonTextComponentCodec,
+    TextComponentCodec,
+)
 from pythonium.engine.codecs.game_codecs import (
     ModifierDataCodec,
     ModifierDataStruct,
@@ -88,6 +91,7 @@ type Identifier = Annotated[
 type TextComponent = Annotated[NBTCompound, TextComponentCodec()]
 type ModifierData = Annotated[ModifierDataStruct, ModifierDataCodec()]
 
+type JsonTextComponent = Annotated[str, JsonTextComponentCodec()]
 type Slot = Annotated[SlotStruct, SlotCodec()]
 
 type SlotArray = Annotated[list[SlotStruct], ArrayCodec(SlotCodec())]

@@ -5,13 +5,12 @@ from asyncio import (
     gather,
     start_server,
 )
-from collections.abc import Iterable, Sized
 from logging import getLogger
 
 from pythonium.engine import Client, Router
 from pythonium.engine.client import ClientConnection, ClientSession
 from pythonium.engine.enums import State
-from pythonium.engine.packets import serialize
+from pythonium.engine.packets.base import Packet
 from pythonium.engine.properties_reader import get_properties
 from pythonium.engine.server import PacketReader
 from pythonium.engine.ticker.ticker import Ticker
@@ -24,7 +23,7 @@ class Server:
     """Class representing Minecraft server."""
 
     def __init__(self, **kwargs: object) -> None:
-        self._clients: list[Client] = []
+        self._clients: set[Client] = set()
 
         self.properties = get_properties(path="properties.toml")
 
@@ -35,12 +34,20 @@ class Server:
 
     def add_client(self, client: Client) -> None:
         """Add a client to the server."""
-        self._clients.append(client)
+        self._clients.add(client)
 
     def remove_client(self, client: Client) -> None:
         """Remove a client from the server."""
         if client in self._clients:
             self._clients.remove(client)
+
+    async def broadcast(self, packet: Packet) -> None:
+        for client in list(self._clients):
+            await client.send(packet=packet)
+
+    async def broadcast_many(self, *packets: Packet) -> None:
+        for packet in packets:
+            await self.broadcast(packet=packet)
 
     async def _handle_connection(
         self, reader: StreamReader, writer: StreamWriter
@@ -62,40 +69,22 @@ class Server:
         packet_reader = PacketReader(reader)
 
         async for packet in packet_reader.read(client_session=client.session):
-            logger.debug(packet)
             logger.info(
                 "Received packet with ID %s", f"{packet.packet_id:#04x}"
             )
 
-            server_packet = await self.router.route(
-                packet,
-                client=client,
-                ticker=self.ticker,
-                properties=self.properties,
-                world=self.world,
-            )
-
-            logger.debug(packet)
-
-            if not server_packet:
-                continue
-
-            logger.debug(server_packet)
-
-            if isinstance(server_packet, Iterable) and isinstance(
-                server_packet, Sized
-            ):
-                logger.info(
-                    "Sending %d packets to %s",
-                    len(server_packet),
-                    address,
+            try:
+                await self.router.route(
+                    packet,
+                    client=client,
+                    ticker=self.ticker,
+                    properties=self.properties,
+                    world=self.world,
                 )
-
-                for packet_ in server_packet:
-                    await client.connection.write(serialize(packet_))
-
-            else:
-                await client.connection.write(serialize(server_packet))
+            except Exception as e:
+                if self.properties.server.debug:
+                    await client.kick(str(e))
+                logger.exception("Packet handle error")
 
         self.remove_client(client)
         logger.info("Disconnected from %s", address)

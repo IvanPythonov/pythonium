@@ -27,9 +27,12 @@ class Ticker:
 
             duration = time.monotonic() - start_logic
 
-            if duration > self.TICK_TIME:
+            if duration > self.TICK_TIME and logger.isEnabledFor(
+                logging.DEBUG
+            ):
                 logger.debug(
-                    "Can't keep up! Tick took %s ms", f"{duration * 1000:.2f}"
+                    "Can't keep up! Tick took %s ms",
+                    f"{duration * 1000:.2f}",
                 )
 
             next_tick += self.TICK_TIME

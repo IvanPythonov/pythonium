@@ -1,24 +1,24 @@
 import inspect
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 from functools import cache
 from typing import Any, Self
 
 from pythonium.engine.packets import Packet
 
-type Handler = Callable[..., Any]
+type Handler = Awaitable[Callable[..., None]]
 
 
 @cache
-def _get_func_params(func: Handler) -> set[str]:
-    return set(inspect.signature(func).parameters.keys())
+def _get_func_params(func: Handler) -> frozenset[str]:
+    return frozenset(inspect.signature(func).parameters.keys())
 
 
-def resolve_kwargs(
+def _resolve_kwargs(
     current_kwargs: dict[str, Any], func: Handler
 ) -> dict[str, Any]:
     sig_params = _get_func_params(func)
 
-    return {k: v for k, v in current_kwargs.items() if k in sig_params}
+    return {k: current_kwargs[k] for k in sig_params if k in current_kwargs}
 
 
 class Router:
@@ -110,14 +110,14 @@ class Router:
         self._commands.update(router.commands)
         return self
 
-    async def route(self, packet: Packet, **kwargs: object) -> Packet | None:
+    async def route(self, packet: Packet, **kwargs: object) -> None:
         """Route command to appropriate handler."""
         func = self.resolve_router(packet=type(packet))
 
         if func is None:
             return None
 
-        kwargs = resolve_kwargs(
+        kwargs = _resolve_kwargs(
             current_kwargs=kwargs | self._kwargs, func=func
         )
 
@@ -129,7 +129,3 @@ class Router:
         if packet_id in self._commands:
             return self._commands[packet_id]
         return None
-
-    def __str__(self) -> str:
-        """Return string representation of the router."""
-        return f"{type(self).__name__} {self.name!r}"

@@ -9,6 +9,8 @@ version = "1.21.8"
 host = "127.0.0.1"
 # default port. where we dropping?
 port = 25565
+# debug mode. you shouldnt change this
+debug = true
 
 [auth]
 # true = premium chads only (Mojang auth required)

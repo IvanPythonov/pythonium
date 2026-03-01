@@ -7,4 +7,5 @@ from pythonium.server.routers.play import router as play_router
 
 
 @play_router.on(ClientTickEnd)
-async def on_tick_end(client_information: ClientTickEnd) -> None: ...
+async def on_tick_end(client_tick_end: ClientTickEnd) -> None:
+    pass

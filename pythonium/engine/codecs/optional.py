@@ -2,6 +2,7 @@ from typing import Any, Final
 
 from pythonium.engine.codecs.base import Codec
 from pythonium.engine.codecs.primitives import BooleanCodec
+from pythonium.engine.exceptions import DecodeError
 from pythonium.engine.typealiases import Deserialized
 
 _INTERNAL_BOOLEAN_CODEC = BooleanCodec()
@@ -22,6 +23,9 @@ class OptionalCodec[T](Codec[T | None]):
         ) + self.inner_codec.serialize(field=field)
 
     def deserialize(self, data: bytes) -> Deserialized[T | None]:
+        if not data:
+            raise DecodeError(data=data)
+
         present = data[0] != 0
         offset = 1
 

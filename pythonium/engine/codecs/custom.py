@@ -1,14 +1,19 @@
 import struct
+from typing import Final
 from uuid import UUID
+
+from msgspec.json import encode
 
 from pythonium.engine.codecs.base import Codec
 from pythonium.engine.codecs.nbt import NBTCodec
 from pythonium.engine.codecs.primitives import LongCodec
-from pythonium.engine.exceptions import VarIntDecodeError
+from pythonium.engine.exceptions import DecodeError, VarIntDecodeError
 from pythonium.engine.typealiases import Deserialized
 
-SEGMENT_BITS = 0x7F
-CONTINUE_BIT = 0x80
+SEGMENT_BITS: Final[int] = 0x7F
+CONTINUE_BIT: Final[int] = 0x80
+
+MAX_STRING_LENGTH: Final[int] = 65535
 
 
 class StringCodec(Codec[str]):
@@ -34,6 +39,8 @@ class StringCodec(Codec[str]):
 
     def deserialize(self, data: bytes) -> Deserialized[str]:
         length, varint_size = VarIntCodec().deserialize(data)
+        if length > MAX_STRING_LENGTH:
+            raise DecodeError(max_length=MAX_STRING_LENGTH, length=length)
         value = data[varint_size : varint_size + length].decode("utf-8")
         return value, varint_size + length
 
@@ -145,3 +152,13 @@ class TextComponentCodec(Codec[dict]):
     def deserialize(self, data: bytes) -> Deserialized[dict]:
         value, consumed = NBTCodec().deserialize(data)
         return value, consumed
+
+
+class JsonTextComponentCodec(Codec[str]):
+    """Codec for Json Text Components."""
+
+    def serialize(self, *, field: str) -> bytes:
+        return StringCodec().serialize(field=encode({"text": field}).decode())
+
+    def deserialize(self, data: bytes) -> Deserialized[str]:
+        return StringCodec().deserialize(data=data)

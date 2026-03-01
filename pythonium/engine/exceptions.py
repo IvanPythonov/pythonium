@@ -26,6 +26,12 @@ class DecodeError(Error):
     message = "Decode error just occured."
 
 
+class WriterError(Error):
+    """Exception raised when a writer error occurs."""
+
+    message = "Writer error just occured."
+
+
 class VarIntDecodeError(DecodeError):
     """Exception raised when a varint decode error occurs."""
 

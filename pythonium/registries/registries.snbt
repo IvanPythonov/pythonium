@@ -1,0 +1,167 @@
+{
+    "minecraft:dimension_type": {
+        "minecraft:overworld": {
+            has_skylight: 1b,
+            has_ceiling: 0b,
+            ultrawarm: 0b,
+            natural: 1b,
+            coordinate_scale: 1.0d,
+            bed_works: 1b,
+            respawn_anchor_works: 0b,
+            min_y: -64,
+            height: 384,
+            logical_height: 384,
+            infiniburn: "#minecraft:infiniburn_overworld",
+            effects: "minecraft:overworld",
+            ambient_light: 0.0f,
+            piglin_safe: 0b,
+            has_raids: 1b,
+            monster_spawn_light_level: 0,
+            monster_spawn_block_light_limit: 0
+        }
+    },
+    
+    "minecraft:worldgen/biome": {
+        "minecraft:plains": {
+            has_precipitation: 1b,
+            temperature: 0.8f,
+            downfall: 0.4f,
+            effects: {
+                fog_color: 12638463,
+                water_color: 4159204,
+                water_fog_color: 329011,
+                sky_color: 7907327
+            }
+        }
+    },
+    
+    "minecraft:cat_variant": {
+        "minecraft:tabby": {
+            asset_id: "minecraft:textures/entity/cat/tabby.png",
+            spawn_conditions: [{priority: 1}]
+        }
+    },
+    
+    "minecraft:chicken_variant": {
+        "minecraft:normal": {
+            asset_id: "minecraft:textures/entity/chicken.png",
+            model: "normal",
+            spawn_conditions: [{priority: 1}]
+        }
+    },
+    
+    "minecraft:cow_variant": {
+        "minecraft:normal": {
+            asset_id: "minecraft:textures/entity/cow/cow.png",
+            model: "normal",
+            spawn_conditions: [{priority: 1}]
+        }
+    },
+    
+    "minecraft:frog_variant": {
+        "minecraft:temperate": {
+            asset_id: "minecraft:textures/entity/frog/temperate_frog.png",
+            spawn_conditions: [{priority: 1}]
+        }
+    },
+    
+    "minecraft:pig_variant": {
+        "minecraft:normal": {
+            asset_id: "minecraft:textures/entity/pig/pig.png",
+            model: "normal",
+            spawn_conditions: [{priority: 1}]
+        }
+    },
+    
+    "minecraft:wolf_variant": {
+        "minecraft:pale": {
+            assets: {
+                wild: "minecraft:textures/entity/wolf/wolf.png",
+                tame: "minecraft:textures/entity/wolf/wolf_tame.png",
+                angry: "minecraft:textures/entity/wolf/wolf_angry.png"
+            },
+            spawn_conditions: [{priority: 1}]
+        }
+    },
+    
+    "minecraft:wolf_sound_variant": {
+        "minecraft:classic": {
+            ambient_sound: "minecraft:entity.wolf.ambient",
+            death_sound: "minecraft:entity.wolf.death",
+            growl_sound: "minecraft:entity.wolf.growl",
+            hurt_sound: "minecraft:entity.wolf.hurt",
+            pant_sound: "minecraft:entity.wolf.pant",
+            whine_sound: "minecraft:entity.wolf.whine"
+        }
+    },
+    
+    "minecraft:zombie_nautilus_variant": {
+        "minecraft:normal": {
+            asset_id: "minecraft:textures/entity/zombie/zombie.png",
+            model: "normal",
+            spawn_conditions: [{priority: 1}]
+        }
+    },
+    
+    "minecraft:painting_variant": {
+        "minecraft:kebab": {
+            asset_id: "minecraft:kebab",
+            width: 1,
+            height: 1,
+            title: "{\"text\":\"Kebab\"}",
+            author: "{\"text\":\"ZezuzL0L\"}"
+        }
+    },
+    
+    "minecraft:damage_type": {
+        "minecraft:arrow": {message_id: "arrow", exhaustion: 0.1f, scaling: "when_caused_by_living_non_player", effects: "hurt", death_message_type: "default"},
+        "minecraft:bad_respawn_point": {message_id: "badRespawnPoint", exhaustion: 0.1f, scaling: "always", effects: "hurt", death_message_type: "intentional_game_design"},
+        "minecraft:cactus": {message_id: "cactus", exhaustion: 0.1f, scaling: "always", effects: "hurt", death_message_type: "default"},
+        "minecraft:campfire": {message_id: "campfire", exhaustion: 0.1f, scaling: "always", effects: "hurt", death_message_type: "default"},
+        "minecraft:cramming": {message_id: "cramming", exhaustion: 0.0f, scaling: "never", effects: "hurt", death_message_type: "default"},
+        "minecraft:dragon_breath": {message_id: "dragonBreath", exhaustion: 0.0f, scaling: "never", effects: "hurt", death_message_type: "default"},
+        "minecraft:drown": {message_id: "drown", exhaustion: 0.0f, scaling: "never", effects: "drowning", death_message_type: "default"},
+        "minecraft:dry_out": {message_id: "dryOut", exhaustion: 0.1f, scaling: "always", effects: "hurt", death_message_type: "default"},
+        "minecraft:ender_pearl": {message_id: "fallback", exhaustion: 0.0f, scaling: "never", effects: "hurt", death_message_type: "default"},
+        "minecraft:explosion": {message_id: "explosion", exhaustion: 0.1f, scaling: "always", effects: "hurt", death_message_type: "default"},
+        "minecraft:fall": {message_id: "fall", exhaustion: 0.0f, scaling: "always", effects: "hurt", death_message_type: "fall_variants"},
+        "minecraft:falling_anvil": {message_id: "anvil", exhaustion: 0.1f, scaling: "always", effects: "hurt", death_message_type: "default"},
+        "minecraft:falling_block": {message_id: "fallingBlock", exhaustion: 0.1f, scaling: "always", effects: "hurt", death_message_type: "default"},
+        "minecraft:falling_stalactite": {message_id: "fallingStalactite", exhaustion: 0.1f, scaling: "always", effects: "hurt", death_message_type: "default"},
+        "minecraft:fireball": {message_id: "fireball", exhaustion: 0.1f, scaling: "when_caused_by_living_non_player", effects: "burning", death_message_type: "default"},
+        "minecraft:fireworks": {message_id: "fireworks", exhaustion: 0.1f, scaling: "always", effects: "hurt", death_message_type: "default"},
+        "minecraft:fly_into_wall": {message_id: "flyIntoWall", exhaustion: 0.0f, scaling: "always", effects: "hurt", death_message_type: "default"},
+        "minecraft:freeze": {message_id: "freeze", exhaustion: 0.0f, scaling: "never", effects: "freezing", death_message_type: "default"},
+        "minecraft:generic": {message_id: "generic", exhaustion: 0.0f, scaling: "never", effects: "hurt", death_message_type: "default"},
+        "minecraft:generic_kill": {message_id: "genericKill", exhaustion: 0.0f, scaling: "never", effects: "hurt", death_message_type: "default"},
+        "minecraft:hot_floor": {message_id: "hotFloor", exhaustion: 0.1f, scaling: "always", effects: "hurt", death_message_type: "default"},
+        "minecraft:in_fire": {message_id: "inFire", exhaustion: 0.1f, scaling: "always", effects: "burning", death_message_type: "default"},
+        "minecraft:in_wall": {message_id: "inWall", exhaustion: 0.0f, scaling: "never", effects: "hurt", death_message_type: "default"},
+        "minecraft:indirect_magic": {message_id: "indirectMagic", exhaustion: 0.0f, scaling: "never", effects: "hurt", death_message_type: "default"},
+        "minecraft:lava": {message_id: "lava", exhaustion: 0.1f, scaling: "always", effects: "burning", death_message_type: "default"},
+        "minecraft:lightning_bolt": {message_id: "lightningBolt", exhaustion: 0.1f, scaling: "always", effects: "hurt", death_message_type: "default"},
+        "minecraft:mace_smash": {message_id: "mace_smash", exhaustion: 0.1f, scaling: "always", effects: "hurt", death_message_type: "default"},
+        "minecraft:magic": {message_id: "magic", exhaustion: 0.0f, scaling: "never", effects: "hurt", death_message_type: "default"},
+        "minecraft:mob_attack": {message_id: "mob", exhaustion: 0.1f, scaling: "always", effects: "hurt", death_message_type: "default"},
+        "minecraft:mob_attack_no_aggro": {message_id: "mob", exhaustion: 0.1f, scaling: "always", effects: "hurt", death_message_type: "default"},
+        "minecraft:mob_projectile": {message_id: "mob", exhaustion: 0.1f, scaling: "when_caused_by_living_non_player", effects: "hurt", death_message_type: "default"},
+        "minecraft:on_fire": {message_id: "onFire", exhaustion: 0.0f, scaling: "never", effects: "burning", death_message_type: "default"},
+        "minecraft:out_of_world": {message_id: "outOfWorld", exhaustion: 0.0f, scaling: "never", effects: "hurt", death_message_type: "default"},
+        "minecraft:outside_border": {message_id: "outsideBorder", exhaustion: 0.0f, scaling: "never", effects: "hurt", death_message_type: "default"},
+        "minecraft:player_attack": {message_id: "player", exhaustion: 0.1f, scaling: "always", effects: "hurt", death_message_type: "default"},
+        "minecraft:player_explosion": {message_id: "explosion.player", exhaustion: 0.1f, scaling: "always", effects: "hurt", death_message_type: "default"},
+        "minecraft:sonic_boom": {message_id: "sonic_boom", exhaustion: 0.0f, scaling: "always", effects: "hurt", death_message_type: "default"},
+        "minecraft:spit": {message_id: "mob", exhaustion: 0.1f, scaling: "when_caused_by_living_non_player", effects: "hurt", death_message_type: "default"},
+        "minecraft:stalagmite": {message_id: "stalagmite", exhaustion: 0.0f, scaling: "always", effects: "hurt", death_message_type: "default"},
+        "minecraft:starve": {message_id: "starve", exhaustion: 0.0f, scaling: "never", effects: "hurt", death_message_type: "default"},
+        "minecraft:sting": {message_id: "sting", exhaustion: 0.1f, scaling: "always", effects: "hurt", death_message_type: "default"},
+        "minecraft:sweet_berry_bush": {message_id: "sweetBerryBush", exhaustion: 0.1f, scaling: "always", effects: "poking", death_message_type: "default"},
+        "minecraft:thorns": {message_id: "thorns", exhaustion: 0.1f, scaling: "never", effects: "thorns", death_message_type: "default"},
+        "minecraft:thrown": {message_id: "thrown", exhaustion: 0.1f, scaling: "when_caused_by_living_non_player", effects: "hurt", death_message_type: "default"},
+        "minecraft:trident": {message_id: "trident", exhaustion: 0.1f, scaling: "when_caused_by_living_non_player", effects: "hurt", death_message_type: "default"},
+        "minecraft:unattributed_fireball": {message_id: "onFire", exhaustion: 0.1f, scaling: "always", effects: "burning", death_message_type: "default"},
+        "minecraft:wind_charge": {message_id: "wind_charge", exhaustion: 0.1f, scaling: "always", effects: "hurt", death_message_type: "default"},
+        "minecraft:wither": {message_id: "wither", exhaustion: 0.0f, scaling: "never", effects: "hurt", death_message_type: "default"},
+        "minecraft:wither_skull": {message_id: "witherSkull", exhaustion: 0.1f, scaling: "when_caused_by_living_non_player", effects: "hurt", death_message_type: "default"}
+    }
+}

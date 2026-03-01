@@ -1,9 +1,9 @@
-import io
+import logging
 import types
 from enum import Enum
 from typing import Any, ClassVar, TypeAliasType, get_args
 
-from msgspec import Struct
+from msgspec import Struct, convert
 from msgspec.json import decode, encode
 from msgspec.structs import fields as class_fields
 
@@ -24,6 +24,8 @@ _VARINT_CODEC = VarIntCodec()
 _STRING_CODEC = StringCodec()
 _UNION_TYPE_ARGS_COUNT = 2
 
+logger = logging.getLogger(name=__name__)
+
 
 class Packet(Struct, kw_only=True):
     """Base packet."""
@@ -39,7 +41,11 @@ class Packet(Struct, kw_only=True):
     def __init_subclass__(cls) -> None:
         super().__init_subclass__()
 
-        required_attrs = ("packet_id", "__state__", "__direction__")
+        required_attrs = (
+            "packet_id",
+            "__state__",
+            "__direction__",
+        )
 
         for attr in required_attrs:
             if not hasattr(cls, attr):
@@ -104,24 +110,26 @@ def _resolve_field_codec(
 
 def serialize(packet: Packet) -> bytes:
     """Serialize packet to bytes."""
-    buffer = io.BytesIO()
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(packet)
 
-    packet_id = _VARINT_CODEC.serialize(field=packet.packet_id)
-    buffer.write(packet_id)
+    packet_id_bytes = _VARINT_CODEC.serialize(field=packet.packet_id)
+    chunks = [packet_id_bytes]
 
     if packet.__schema_as_json__:
         json_bytes = encode(packet)
 
-        buffer.write(_VARINT_CODEC.serialize(field=len(json_bytes)))
-        buffer.write(json_bytes)
+        chunks.append(_VARINT_CODEC.serialize(field=len(json_bytes)))
+        chunks.append(json_bytes)
     else:
         for field in packet.get_schema():
             value = getattr(packet, field.name)
-            buffer.write(field.codec.serialize(field=value))
+            chunks.append(field.codec.serialize(field=value))
 
-    length_bytes = _VARINT_CODEC.serialize(field=buffer.tell())
+    payload = b"".join(chunks)
+    length_bytes = _VARINT_CODEC.serialize(field=len(payload))
 
-    return length_bytes + buffer.getvalue()
+    return length_bytes + payload
 
 
 def deserialize[P: Packet](cls: type[P], data: bytes) -> P:
@@ -139,4 +147,8 @@ def deserialize[P: Packet](cls: type[P], data: bytes) -> P:
         kwargs[field.name] = value
         offset += consumed
 
-    return cls(**kwargs)
+    packet = convert(kwargs, type=cls)
+
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(packet)
+    return packet

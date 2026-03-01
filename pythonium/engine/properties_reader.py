@@ -1,8 +1,7 @@
-import tomllib
 from pathlib import Path
 from typing import Literal
 
-from msgspec import Struct, convert
+from msgspec import Struct, toml
 
 
 class KebabStruct(Struct, rename="kebab"):
@@ -17,6 +16,7 @@ class ServerProperties(KebabStruct):
     version: str
     host: str
     port: int
+    debug: bool
 
 
 class AuthProperties(KebabStruct):
@@ -70,6 +70,4 @@ class Properties(KebabStruct):
 
 def get_properties(path: Path | str) -> Properties:
     with Path(path).open("rb") as file:
-        data = tomllib.load(file)
-
-    return convert(data, type=Properties)
+        return toml.decode(file.read(), type=Properties)

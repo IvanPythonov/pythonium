@@ -7,6 +7,7 @@ from pythonium.server.routers.play import router as play_router
 
 
 @play_router.on(DebugEvent)
-async def on_move_player_rot(
-    client_information: DebugEvent,
-) -> None: ...
+async def on_debug_event(
+    debug_event: DebugEvent,
+) -> None:
+    pass

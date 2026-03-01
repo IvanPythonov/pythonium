@@ -1,10 +1,7 @@
 from enum import StrEnum
 from typing import TYPE_CHECKING, Any
 
-try:
-    from nbtlib import Compound
-except ImportError:
-    from collections import UserDict as Compound  # Fallback for type checking
+from nbtlib import Compound
 
 from pythonium.engine.codecs import Codec, OptionalCodec
 

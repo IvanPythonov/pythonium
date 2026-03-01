@@ -1,14 +1,18 @@
 from .base import Packet, deserialize, serialize
-from .client.configuration import (
+from .ingoing.configuration import (
     AcknowledgeFinishConfiguration,
     ClientInformation,
     ConfigurationCustomPayload,
     KeepAliveConfigurationRequest,
     PongConfiguration,
 )
-from .client.handshake import Handshake
-from .client.login import LoginAcknowledged, LoginCustomPayload, LoginStart
-from .client.play import (
+from .ingoing.handshake import Handshake
+from .ingoing.login import (
+    LoginAcknowledged,
+    LoginCustomPayload,
+    LoginStart,
+)
+from .ingoing.play import (
     AcknowledgeConfiguration,
     AcknowledgeMessage,
     BundleItemSelected,
@@ -54,50 +58,49 @@ from .client.play import (
     UseItem,
     UseItemOn,
 )
-from .client.play import (
+from .ingoing.play import (
     ChangeDifficulty as ClientPlayChangeDifficulty,
 )
-from .client.play import (
+from .ingoing.play import (
     ClientInformation as PlayClientInformation,
 )
-from .client.play import (
+from .ingoing.play import (
     CloseContainer as ClientPlayCloseContainer,
 )
-from .client.play import (
+from .ingoing.play import (
     CustomClickAction as PlayCustomClickAction,
 )
-from .client.play import (
+from .ingoing.play import (
     MoveVehicle as ClientPlayMoveVehicle,
 )
-from .client.play import (
+from .ingoing.play import (
     PingRequest as PlayPingRequest,
 )
-from .client.play import (
+from .ingoing.play import (
     PlayerAbilities as ClientPlayPlayerAbilities,
 )
-from .client.play import (
+from .ingoing.play import (
     Pong as PlayPong,
 )
-from .client.play import (
+from .ingoing.play import (
     ResourcePackResponse as PlayResourcePackResponse,
 )
-from .client.play import (
+from .ingoing.play import (
     ServerboundKeepAlive as PlayServerboundKeepAlive,
 )
-from .client.play import (
+from .ingoing.play import (
     SetHeldItem as ClientPlaySetHeldItem,
 )
-from .client.status import GetStatus, Ping
-from .packet_storage import PacketStorage
-from .server.configuration import (
-    Disconnect,
+from .ingoing.status import GetStatus, Ping
+from .outgoing.configuration import (
+    ConfigurationDisconnect,
     FinishConfiguration,
     KeepAliveConfigurationResponse,
     PingConfiguration,
     RegistryData,
 )
-from .server.login import LoginSuccess
-from .server.play import (
+from .outgoing.login import LoginDisconnect, LoginSuccess
+from .outgoing.play import (
     AcknowledgeBlockChange,
     AwardStatistics,
     BlockAction,
@@ -201,61 +204,62 @@ from .server.play import (
     UpdateTime,
     WorldEvent,
 )
-from .server.play import (
+from .outgoing.play import (
     AddResourcePack as PlayAddResourcePack,
 )
-from .server.play import (
+from .outgoing.play import (
     ChangeDifficulty as ServerPlayChangeDifficulty,
 )
-from .server.play import (
+from .outgoing.play import (
     ClearDialog as PlayClearDialog,
 )
-from .server.play import (
+from .outgoing.play import (
     ClientboundKeepAlive as PlayClientboundKeepAlive,
 )
-from .server.play import (
+from .outgoing.play import (
     ClientboundPluginMessage as PlayClientboundPluginMessage,
 )
-from .server.play import (
+from .outgoing.play import (
     CloseContainer as ServerPlayCloseContainer,
 )
-from .server.play import (
+from .outgoing.play import (
     CookieRequest as PlayCookieRequest,
 )
-from .server.play import (
+from .outgoing.play import (
     CustomReportDetails as PlayCustomReportDetails,
 )
-from .server.play import (
+from .outgoing.play import (
     Disconnect as PlayDisconnect,
 )
-from .server.play import (
+from .outgoing.play import (
     MoveVehicle as ServerPlayMoveVehicle,
 )
-from .server.play import (
+from .outgoing.play import (
     Ping as PlayPing,
 )
-from .server.play import (
+from .outgoing.play import (
     PlayerAbilities as ServerPlayPlayerAbilities,
 )
-from .server.play import (
+from .outgoing.play import (
     RemoveResourcePack as PlayRemoveResourcePack,
 )
-from .server.play import (
+from .outgoing.play import (
     ServerLinks as PlayServerLinks,
 )
-from .server.play import (
+from .outgoing.play import (
     SetHeldItem as ServerPlaySetHeldItem,
 )
-from .server.play import (
+from .outgoing.play import (
     ShowDialog as PlayShowDialog,
 )
-from .server.play import (
+from .outgoing.play import (
     StoreCookie as PlayStoreCookie,
 )
-from .server.play import (
+from .outgoing.play import (
     Transfer as PlayTransfer,
 )
-from .server.status import Pong, ServerStatus
+from .outgoing.status import Pong, ServerStatus
+from .packet_storage import PacketStorage
 
 __all__ = (
     "AcknowledgeBlockChange",
@@ -299,6 +303,7 @@ __all__ = (
     "CommandSuggestionsResponse",
     "Commands",
     "ConfigurationCustomPayload",
+    "ConfigurationDisconnect",
     "ConfirmTeleportation",
     "CookieRequest",
     "CustomClickAction",
@@ -310,7 +315,6 @@ __all__ = (
     "DebugEvent",
     "DebugSample",
     "DeleteMessage",
-    "Disconnect",
     "DisguisedChatMessage",
     "DisplayObjective",
     "EndCombat",
@@ -335,6 +339,7 @@ __all__ = (
     "Login",
     "LoginAcknowledged",
     "LoginCustomPayload",
+    "LoginDisconnect",
     "LoginStart",
     "LoginSuccess",
     "LookAt",
