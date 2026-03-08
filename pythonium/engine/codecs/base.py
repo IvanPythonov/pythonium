@@ -26,7 +26,13 @@ class PrimitiveCodec[T](Codec[T]):
 
     __format_character__: str
 
+    _struct: struct.Struct
+    _size: int
+
     def __init_subclass__(cls) -> None:
+        cls._struct = struct.Struct(cls.__format_character__)
+        cls._size = cls._struct.size
+
         if not hasattr(cls, "__format_character__"):
             msg = (
                 f"{cls.__name__} used PrimitiveCodec"
@@ -36,12 +42,11 @@ class PrimitiveCodec[T](Codec[T]):
         return super().__init_subclass__()
 
     def serialize(self, *, field: T) -> bytes:
-        return struct.pack(self.__format_character__, field)
+        return self._struct.pack(field)
 
     def deserialize(self, data: bytes) -> Deserialized[T]:
-        size: int = struct.calcsize(self.__format_character__)
-        value: T = struct.unpack(self.__format_character__, data[:size])[0]
-        return value, size
+        value: T = self._struct.unpack(data[: self._size])[0]
+        return value, self._size
 
 
 @cache
