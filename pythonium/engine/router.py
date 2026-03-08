@@ -5,7 +5,7 @@ from typing import Any, Self
 
 from pythonium.engine.packets import Packet
 
-type Handler = Awaitable[Callable[..., None]]
+type Handler = Callable[..., Awaitable[None]]
 
 
 @cache
