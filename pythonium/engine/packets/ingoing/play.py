@@ -320,7 +320,7 @@ class Position(Packet, kw_only=True):
     x: Double
     y: Double
     z: Double
-    flags: TeleportFlags
+    on_ground: Boolean
 
 
 class PositionLook(Packet, kw_only=True):
@@ -333,7 +333,7 @@ class PositionLook(Packet, kw_only=True):
     z: Double
     yaw: Float
     pitch: Float
-    flags: TeleportFlags
+    on_ground: Boolean
 
 
 class Look(Packet, kw_only=True):
@@ -343,7 +343,7 @@ class Look(Packet, kw_only=True):
 
     yaw: Float
     pitch: Float
-    flags: TeleportFlags
+    on_ground: Boolean
 
 
 class Flying(Packet, kw_only=True):
@@ -351,7 +351,7 @@ class Flying(Packet, kw_only=True):
 
     __packet_name__: ClassVar[str] = "play:serverbound:flying"
 
-    flags: TeleportFlags
+    on_ground: Boolean
 
 
 class VehicleMove(Packet, kw_only=True):
