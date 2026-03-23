@@ -1,21 +1,15 @@
-from enum import StrEnum
+from enum import Enum, StrEnum
 from typing import TYPE_CHECKING, Any
 
-from nbtlib import Compound
-
-from pythonium.engine.codecs import Codec, OptionalCodec
+from msgspec import Struct
+from msgspec.structs import fields as get_struct_fields
 
 if TYPE_CHECKING:
     from pythonium.engine.packets.base import Packet
 
-_INDENT_STEP = "    "
-_BYTES_TRUNCATE_LENGTH = 32
-_SIMPLE_LIST_MAX_LENGTH = 10
-_MIN_LINES_FOR_COMMA_STRIP = 2
-
 
 class Colors(StrEnum):
-    """Colors enumeration."""
+    """Colors string enum."""
 
     GREEN_BOLD = "\033[1;32m"
     GRAY = "\033[90m"
@@ -29,134 +23,91 @@ class Colors(StrEnum):
     RESET = "\033[0m"
 
 
-def _get_codec_name(codec: Codec[Any]) -> str:
-    match codec:
-        case OptionalCodec():
-            return f"Optional[{_get_codec_name(codec.inner_codec)}]"
-        case _:
-            return codec.__class__.__name__.removesuffix("Codec")
+_INDENT = "    "
 
 
-def _format_none() -> str:
-    return f"{Colors.GRAY}None{Colors.RESET}"
+def _format_value(value: Any, level: int = 0) -> str:  # noqa: ANN401, C901, PLR0911
+    if value is None:
+        return f"{Colors.GRAY}None{Colors.RESET}"
 
+    if isinstance(value, bool):
+        return f"{Colors.GREEN if value else Colors.RED}{value}{Colors.RESET}"
 
-def _format_bool(value: bool) -> str:  # noqa: FBT001
-    color = Colors.GREEN if value else Colors.RED
-    return f"{color}{value}{Colors.RESET}"
+    if isinstance(value, (int, float)):
+        return f"{Colors.CYAN}{value!r}{Colors.RESET}"
 
+    if isinstance(value, str):
+        return f"{Colors.YELLOW}{value!r}{Colors.RESET}"
 
-def _format_string(value: str) -> str:
-    return f"{Colors.YELLOW}{value!r}{Colors.RESET}"
-
-
-def _format_number(value: float) -> str:
-    return f"{Colors.CYAN}{value!r}{Colors.RESET}"
-
-
-def _format_bytes(value: bytes) -> str:
-    if len(value) > _BYTES_TRUNCATE_LENGTH:
-        snippet = repr(value[:_BYTES_TRUNCATE_LENGTH]) + "..."
-        length_info = f"{Colors.GRAY}(len={len(value)}){Colors.RESET}"
-        return f"{Colors.BLUE}{snippet}{Colors.RESET} {length_info}"
-    return f"{Colors.BLUE}{value!r}{Colors.RESET}"
-
-
-def _format_dict(value: dict | Compound, level: int) -> str:
-    indent = _INDENT_STEP * level
-    next_indent = _INDENT_STEP * (level + 1)
-
-    if not value:
-        return f"{Colors.GRAY}{{}}{Colors.RESET}"
-
-    lines = [f"{Colors.GRAY}{{{Colors.RESET}"]
-    for k, v in value.items():
-        formatted_k = f"{Colors.PURPLE}{k!r}{Colors.RESET}"
-        formatted_v = _format_value(v, level + 1)
-        lines.append(f"{next_indent}{formatted_k}: {formatted_v},")
-
-    lines[-1] = lines[-1].rstrip(",")
-    lines.append(f"{indent}{Colors.GRAY}}}{Colors.RESET}")
-    return "\n".join(lines)
-
-
-def _format_sequence(value: list | tuple, level: int) -> str:
-    indent = _INDENT_STEP * level
-    next_indent = _INDENT_STEP * (level + 1)
-
-    if not value:
-        return f"{Colors.GRAY}[]{Colors.RESET}"
-
-    if len(value) < _SIMPLE_LIST_MAX_LENGTH and all(
-        isinstance(x, (int, float, bool, str, type(None))) for x in value
-    ):
-        items = ", ".join(_format_value(x, 0) for x in value)
+    if isinstance(value, Enum):
         return (
-            f"{Colors.GRAY}[{Colors.RESET} "
-            f"{items} "
-            f"{Colors.GRAY}]{Colors.RESET}"
+            f"{Colors.PURPLE}{value.__class__.__name__}.{value.name}"
+            f"{Colors.RESET}"
         )
 
-    lines = [f"{Colors.GRAY}[{Colors.RESET}"]
-    for _, item in enumerate(value):
-        formatted_v = _format_value(item, level + 1)
-        lines.append(f"{next_indent}{formatted_v},")
+    if isinstance(value, bytes):
+        snippet = repr(value[:32]) + ("..." if len(value) > 32 else "")
+        return (
+            f"{Colors.BLUE}{snippet}{Colors.RESET}"
+            f" {Colors.GRAY}(len={len(value)}){Colors.RESET}"
+        )
 
-    lines[-1] = lines[-1].rstrip(",")
-    lines.append(f"{indent}{Colors.GRAY}]{Colors.RESET}")
-    return "\n".join(lines)
+    if isinstance(value, Struct):
+        indent = _INDENT * level
+        next_indent = _INDENT * (level + 1)
+        lines = [
+            f"{Colors.PURPLE}{value.__class__.__name__}{Colors.GRAY}{{{Colors.RESET}"
+        ]
 
+        for field in get_struct_fields(value):
+            f_val = getattr(value, field.name)
+            lines.append(
+                f"{next_indent}{Colors.CYAN_BRIGHT}{field.name}{Colors.RESET}:"
+                f" {_format_value(f_val, level + 1)},"
+            )
 
-def _format_value(value: Any, level: int = 0) -> str:  # noqa: ANN401
-    result: str
+        if len(lines) > 1:
+            lines[-1] = lines[-1].rstrip(",")
+        lines.append(f"{indent}{Colors.GRAY}}}{Colors.RESET}")
+        return "\n".join(lines)
 
-    if value is None:
-        result = _format_none()
-    elif isinstance(value, bool):
-        result = _format_bool(value)
-    elif isinstance(value, str):
-        result = _format_string(value)
-    elif isinstance(value, (int, float)):
-        result = _format_number(value)
-    elif isinstance(value, bytes):
-        result = _format_bytes(value)
-    elif isinstance(value, (dict, Compound)):
-        result = _format_dict(value, level)
-    elif isinstance(value, (list, tuple)):
-        result = _format_sequence(value, level)
-    else:
-        result = repr(value)
+    if isinstance(value, (list, tuple)):
+        if not value:
+            return f"{Colors.GRAY}[]{Colors.RESET}"
+        items = ", ".join(_format_value(x, 0) for x in value[:10])
+        return (
+            f"{Colors.GRAY}[{Colors.RESET} {items} {Colors.GRAY}]"
+            f"{Colors.RESET}"
+        )
 
-    return result
+    if isinstance(value, dict):
+        return f"{Colors.GRAY}{{{Colors.RESET}...{Colors.GRAY}}}{Colors.RESET}"
 
-
-def _format_field(name: str, value: Any, codec: Codec[Any]) -> str:  # noqa: ANN401
-    codec_name = _get_codec_name(codec)
-    formatted_value = _format_value(value, level=1)
-
-    return (
-        f"{_INDENT_STEP}{Colors.GRAY}({codec_name}){Colors.RESET} "
-        f"{Colors.CYAN_BRIGHT}{name}{Colors.RESET}: {formatted_value}"
-    )
+    return repr(value)
 
 
 def format_packet(packet: "Packet") -> str:
-    lines: list[str] = [
-        f"\n{Colors.GREEN_BOLD}({packet.__class__.__name__}):{Colors.RESET}"
+    lines = [
+        f"\n{Colors.GREEN_BOLD}({packet.__class__.__name__}){Colors.RESET}:"
     ]
 
-    packet_id_value = f"{Colors.CYAN}{packet.packet_id:#04x}{Colors.RESET}"
     lines.append(
-        f"{_INDENT_STEP}{Colors.GRAY}(VarInt){Colors.RESET} "
-        f"{Colors.CYAN_BRIGHT}packet_id{Colors.RESET}: {packet_id_value},"
+        f"{_INDENT}({Colors.GREEN}VarInt{Colors.RESET}) "
+        f"{Colors.CYAN_BRIGHT}packet_id{Colors.RESET}: {Colors.CYAN}"
+        f"{packet.packet_id:#04x}{Colors.RESET},"
     )
-    schema = packet.get_schema()
 
-    for field in schema:
-        value = getattr(packet, field.name)
-        lines.append(_format_field(field.name, value, field.codec) + ",")
+    for field in packet.get_schema():
+        val = getattr(packet, field.name)
+        codec_name = field.codec.__class__.__name__.removesuffix("Codec")
+        formatted_val = _format_value(val, level=1)
 
-    if len(lines) > _MIN_LINES_FOR_COMMA_STRIP:
+        lines.append(
+            f"{_INDENT}({Colors.GREEN}{codec_name}{Colors.RESET}) "
+            f"{Colors.CYAN_BRIGHT}{field.name}{Colors.RESET}: {formatted_val},"
+        )
+
+    if len(lines) > 1:
         lines[-1] = lines[-1].rstrip(",")
 
     return "\n".join(lines)
