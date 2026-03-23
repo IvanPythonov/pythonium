@@ -50,14 +50,34 @@ class Server:
         for packet in packets:
             await self.broadcast(packet=packet)
 
+    def _configure_socket(self, writer: StreamWriter) -> None:
+        client_socket: socket.socket = writer.get_extra_info("socket")
+        if not client_socket:
+            return
+
+        client_socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+
+        if hasattr(socket, "TCP_QUICKACK"):
+            client_socket.setsockopt(
+                socket.IPPROTO_TCP, socket.TCP_QUICKACK, 1
+            )
+
+        client_socket.setsockopt(
+            socket.SOL_SOCKET, socket.SO_SNDBUF, 128 * 1024
+        )
+        client_socket.setsockopt(
+            socket.SOL_SOCKET, socket.SO_RCVBUF, 128 * 1024
+        )
+
+        client_socket.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+
+        writer.transport.set_write_buffer_limits(high=64 * 1024)
+
     async def _handle_connection(
         self, reader: StreamReader, writer: StreamWriter
     ) -> None:
         """Handle a new client connection."""
-        client_socket: socket.socket = writer.get_extra_info("socket")
-
-        if client_socket is not None:
-            client_socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+        self._configure_socket(writer=writer)
 
         address: str = writer.get_extra_info("peername")[0]
         logger.info("New connection from %s", address)
