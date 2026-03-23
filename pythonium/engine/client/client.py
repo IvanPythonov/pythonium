@@ -1,3 +1,5 @@
+from collections.abc import Callable
+
 from nbtlib import String
 
 from pythonium.engine.client.connection import ClientConnection
@@ -10,6 +12,19 @@ from pythonium.engine.packets.outgoing import (
     LoginDisconnect,
     PlayDisconnect,
 )
+
+_KICK_FACTORIES: dict[
+    State,
+    Callable[
+        [str], LoginDisconnect | ConfigurationDisconnect | PlayDisconnect
+    ],
+] = {
+    State.LOGIN: lambda reason: LoginDisconnect(reason=reason),
+    State.CONFIGURATION: lambda reason: ConfigurationDisconnect(
+        reason={"text": String(reason)}
+    ),
+    State.PLAY: lambda reason: PlayDisconnect(reason={"text": String(reason)}),
+}
 
 
 class Client:
@@ -24,24 +39,16 @@ class Client:
         self.unique_id = connection.address
 
     async def kick(self, reason: str) -> None:
-        reason_payload = {"text": String(reason)}
-        packet: Packet | None = None
+        packet_factory = _KICK_FACTORIES.get(self.session.state)
 
-        match self.session.state:
-            case State.LOGIN:
-                packet = LoginDisconnect(reason=reason)
-            case State.CONFIGURATION:
-                packet = ConfigurationDisconnect(reason=reason_payload)
-            case State.PLAY:
-                packet = PlayDisconnect(reason=reason_payload)
-            case _:
-                raise KickError(
-                    info="Wrong state (maybe status).",
-                    state=self.session.state,
-                )
+        if not packet_factory:
+            raise KickError(
+                info="Wrong state for kicking (maybe status).",
+                state=self.session.state,
+            )
 
-        await self.connection.write(serialize(packet))
-
+        packet = packet_factory(reason)
+        await self.send(packet)
         await self.connection.disconnect()
 
     async def send(self, packet: Packet) -> None:
