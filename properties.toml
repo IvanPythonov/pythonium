@@ -6,7 +6,7 @@ max-players = 123
 # actually, server supports only 1.21.8
 version = "1.21.8"
 # "0.0.0.0" to let the whole squad pull up, "127.0.0.1" if you're just testing solo (lonely arc)
-host = "127.0.0.1"
+host = "0.0.0.0"
 # default port. where we dropping?
 port = 25565
 # debug mode. you shouldnt change this

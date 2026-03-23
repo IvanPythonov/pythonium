@@ -1,0 +1,7 @@
+services:
+  server:
+    build: .
+    image: pythonium
+    ports:
+      - "25565:25565"
+    restart: always

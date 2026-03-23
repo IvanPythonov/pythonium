@@ -7,7 +7,7 @@ requires-python = ">=3.12"
 dependencies = [
     "msgspec>=0.20.0",
     "nbtlib>=2.0.4",
-    "winloop>=0.5.0",
+    "uvloop>=0.22.1",
 ]
 
 [dependency-groups]
