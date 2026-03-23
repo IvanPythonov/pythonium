@@ -17,7 +17,7 @@
 </div>
 
 > [!Warning]
-> **pythonium** is currently in the **WIP stage**. While the networking core and dependency injection are built for high performance, the world logic and physics are still experimental. **Not for production use!**
+> **Pythonium** is currently in the **WIP stage**. While the networking core and dependency injection are built for high performance, the world logic and physics are still experimental. **Not for production use!**
 
 ## Quick start
 
