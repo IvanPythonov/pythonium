@@ -1,3 +1,4 @@
+import asyncio
 import socket
 from asyncio import (
     StreamReader,
@@ -41,8 +42,9 @@ class Server:
         self._clients.discard(client)
 
     async def broadcast(self, packet: Packet) -> None:
-        for client in list(self._clients):
-            await client.send(packet=packet)
+        await asyncio.gather(
+            *(client.send(packet) for client in self._clients)
+        )
 
     async def broadcast_many(self, *packets: Packet) -> None:
         for packet in packets:
