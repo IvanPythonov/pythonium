@@ -38,8 +38,7 @@ class Server:
 
     def remove_client(self, client: Client) -> None:
         """Remove a client from the server."""
-        if client in self._clients:
-            self._clients.remove(client)
+        self._clients.discard(client)
 
     async def broadcast(self, packet: Packet) -> None:
         for client in list(self._clients):
