@@ -36,7 +36,7 @@ docker compose up -d
 
 **Pythonium** is a high-performance Minecraft server core built from the ground up. It challenges the "Python is slow" stereotype by utilizing low-level event loops, zero-copy memory views, and ultra-fast serialization
 
-### 🚀 Key Features
+### Key Features
 
 - **Protocol 772 Support**: Full compatibility with Minecraft 1.21.8.
 - **Extreme Serialization**: Powered by `msgspec` for near-instant binary packet processing.
