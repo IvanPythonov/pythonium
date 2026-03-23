@@ -14,7 +14,7 @@ class PacketStorage:
 
     @classmethod
     def add(cls, packet: type["Packet"]) -> None:
-        key = (packet.packet_id, packet.__state__, packet.__direction__)
+        key = (packet.packet_id, packet.state, packet.direction)
         if key in cls._packets:
             return
         cls._packets[key] = packet

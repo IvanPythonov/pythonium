@@ -2,7 +2,7 @@ from pathlib import Path
 
 from nbtlib import parse_nbt
 
-from pythonium.engine.packets import RegistryData
+from pythonium.engine.packets.outgoing import RegistryData
 
 REGISTRIES_FILE = Path(__file__).parent / "registries.snbt"
 REGISTRIES_NBT = parse_nbt(REGISTRIES_FILE.read_text(encoding="utf-8"))

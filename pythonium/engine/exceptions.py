@@ -17,28 +17,48 @@ class Error(Exception):
 class PacketNotFoundError(Error):
     """Exception raised when a packet is not found."""
 
-    message = "Unknown packet."
+    message = "Failed to resolve packet."
 
 
 class DecodeError(Error):
     """Exception raised when a decode error occurs."""
 
-    message = "Decode error just occured."
+    message = "Failed to decode incoming packet payload."
+
+
+class EncodeError(Error):
+    """Exception raised when a encode error occurs."""
+
+    message = "Failed to encode outgoing packet payload."
 
 
 class WriterError(Error):
     """Exception raised when a writer error occurs."""
 
-    message = "Writer error just occured."
+    message = "Failed to write data to client socket."
 
 
 class VarIntDecodeError(DecodeError):
     """Exception raised when a varint decode error occurs."""
 
-    message = "Tried to read too long of a VarInt"
+    message = "Malformed VarInt detected."
 
 
 class PacketTooLargeError(DecodeError):
     """Exceptions raised when a packet too large error occurs."""
 
-    message = "Packet too large"
+    message = "Packet size exceeds server limits."
+
+
+class ActionError(DecodeError):
+    """Exceptions raised when a action error occurs."""
+
+    message = "Invalid action."
+
+
+class KickError(PacketNotFoundError):
+    """Exceptions raised when a kick error occurs."""
+
+    message = (
+        PacketNotFoundError.message.removesuffix(".") + ", kick is impossible."
+    )

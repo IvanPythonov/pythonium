@@ -2,7 +2,8 @@
 
 from pythonium.engine import Router
 from pythonium.engine.client import Client
-from pythonium.engine.packets import GetStatus, Ping, Pong, ServerStatus
+from pythonium.engine.packets.ingoing import PingStart, StatusPing
+from pythonium.engine.packets.outgoing import ServerInfo, StatusPong
 from pythonium.engine.properties_reader import Properties
 
 router = Router(name=__name__)
@@ -12,12 +13,12 @@ PROTOCOL_VERSION = {
 }
 
 
-@router.on(GetStatus)
+@router.on(PingStart)
 async def on_status(
-    _status: GetStatus, properties: Properties, client: Client
+    _status: PingStart, properties: Properties, client: Client
 ) -> None:
     await client.send(
-        ServerStatus(
+        ServerInfo(
             version={
                 "name": properties.server.version,
                 "protocol": PROTOCOL_VERSION[properties.server.version],
@@ -37,6 +38,6 @@ async def on_status(
     )
 
 
-@router.on(Ping)
-async def on_ping(ping: Ping, client: Client) -> None:
-    await client.send(Pong(time=ping.time))
+@router.on(StatusPing)
+async def on_ping(ping: StatusPing, client: Client) -> None:
+    await client.send(StatusPong(time=ping.time))

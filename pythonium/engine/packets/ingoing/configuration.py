@@ -1,25 +1,23 @@
 from typing import ClassVar
 
-from pythonium.engine.enums import Direction, State
-from pythonium.engine.packets import Packet
+from pythonium.engine.packets.base import Packet
 from pythonium.engine.types import (
+    UUID,
     Boolean,
     Byte,
     Int,
     Long,
+    RestBuffer,
     String,
     UByte,
     VarInt,
 )
 
 
-class ClientInformation(Packet, kw_only=True):
-    """Packet representing client information."""
+class Settings(Packet, kw_only=True):
+    """Packet representing Settings."""
 
-    __state__: ClassVar[State] = State.CONFIGURATION
-    __direction__: ClassVar[Direction] = Direction.SERVERBOUND
-
-    packet_id: ClassVar[VarInt] = 0x00
+    __packet_name__: ClassVar[str] = "configuration:serverbound:settings"
 
     locale: String  # e.g en_GB
     view_distance: Byte
@@ -32,44 +30,69 @@ class ClientInformation(Packet, kw_only=True):
     particle_status: VarInt  # 0: all, 1: decreased, 2: minimal
 
 
-class PongConfiguration(Packet, kw_only=True):
-    """Packet representing pong configuration."""
+class CookieResponse(Packet, kw_only=True):
+    """Packet representing CookieResponse."""
 
-    __state__: ClassVar[State] = State.CONFIGURATION
-    __direction__: ClassVar[Direction] = Direction.SERVERBOUND
-
-    packet_id: ClassVar[VarInt] = 0x05
-
-    id_: Int
+    __packet_name__: ClassVar[str] = (
+        "configuration:serverbound:cookie_response"
+    )
 
 
-class KeepAliveConfigurationRequest(Packet, kw_only=True):
-    """Packet representing keep alive configuration."""
+class CustomPayload(Packet, kw_only=True):
+    """Packet representing CustomPayload."""
 
-    __state__: ClassVar[State] = State.CONFIGURATION
-    __direction__: ClassVar[Direction] = Direction.SERVERBOUND
+    __packet_name__: ClassVar[str] = "configuration:serverbound:custom_payload"
 
-    packet_id: ClassVar[VarInt] = 0x04
+    channel: String
+    data: RestBuffer
+
+
+class FinishConfiguration(Packet, kw_only=True):
+    """Packet representing FinishConfiguration."""
+
+    __packet_name__: ClassVar[str] = (
+        "configuration:serverbound:finish_configuration"
+    )
+
+
+class KeepAlive(Packet, kw_only=True):
+    """Packet representing KeepAlive."""
+
+    __packet_name__: ClassVar[str] = "configuration:serverbound:keep_alive"
 
     keep_alive_id: Long
 
 
-class ConfigurationCustomPayload(Packet, kw_only=True):
-    """Packet representing configuration custom payload."""
+class Pong(Packet, kw_only=True):
+    """Packet representing Pong."""
 
-    __state__: ClassVar[State] = State.CONFIGURATION
-    __direction__: ClassVar[Direction] = Direction.SERVERBOUND
+    __packet_name__: ClassVar[str] = "configuration:serverbound:pong"
 
-    packet_id: ClassVar[VarInt] = 0x02
-
-    brand: String
-    data: String
+    id_: Int
 
 
-class AcknowledgeFinishConfiguration(Packet, kw_only=True):
-    """Packet representing finish configuration."""
+class ResourcePackReceive(Packet, kw_only=True):
+    """Packet representing ResourcePackReceive."""
 
-    __state__: ClassVar[State] = State.CONFIGURATION
-    __direction__: ClassVar[Direction] = Direction.SERVERBOUND
+    __packet_name__: ClassVar[str] = (
+        "configuration:serverbound:resource_pack_receive"
+    )
 
-    packet_id: ClassVar[VarInt] = 0x03
+    uuid: UUID
+    result: VarInt
+
+
+class SelectKnownPacks(Packet, kw_only=True):
+    """Packet representing SelectKnownPacks."""
+
+    __packet_name__: ClassVar[str] = (
+        "configuration:serverbound:select_known_packs"
+    )
+
+
+class CustomClickAction(Packet, kw_only=True):
+    """Packet representing CustomClickAction."""
+
+    __packet_name__: ClassVar[str] = (
+        "configuration:serverbound:custom_click_action"
+    )

@@ -41,7 +41,7 @@ class Router:
         ) -> Handler:
             for command_type in commands_type:
                 self._commands[
-                    (command_type.__state__, command_type.packet_id)
+                    (command_type.state, command_type.packet_id)
                 ] = func
             return func
 
@@ -124,7 +124,7 @@ class Router:
         return await func(packet, **kwargs)
 
     def resolve_router(self, packet: type[Packet]) -> Handler | None:
-        packet_id = (packet.__state__, packet.packet_id)
+        packet_id = (packet.state, packet.packet_id)
 
         if packet_id in self._commands:
             return self._commands[packet_id]

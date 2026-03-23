@@ -1,35 +1,64 @@
 from typing import ClassVar
 
-from pythonium.engine.enums import Direction, State
-from pythonium.engine.packets import Packet
+from pythonium.engine.packets.base import Packet
 from pythonium.engine.types import (
     UUID,
     Boolean,
-    JsonTextComponent,
+    ByteArray,
+    RestBuffer,
     String,
     VarInt,
 )
 
 
-class LoginSuccess(Packet, kw_only=True):
-    """Packet representing login success."""
+class Disconnect(Packet, kw_only=True):
+    """Packet representing Disconnect."""
 
-    __state__: ClassVar[State] = State.LOGIN
-    __direction__: ClassVar[Direction] = Direction.CLIENTBOUND
+    __packet_name__: ClassVar[str] = "login:clientbound:disconnect"
 
-    packet_id: ClassVar[VarInt] = 0x02
+    reason: String
+
+
+class EncryptionBegin(Packet, kw_only=True):
+    """Packet representing EncryptionBegin."""
+
+    __packet_name__: ClassVar[str] = "login:clientbound:encryption_begin"
+
+    server_id: String
+    public_key: ByteArray
+    verify_token: ByteArray
+    should_authenticate: Boolean
+
+
+class Success(Packet, kw_only=True):
+    """Packet representing Success."""
+
+    __packet_name__: ClassVar[str] = "login:clientbound:success"
 
     uuid: UUID
     name: String
     is_legacy: Boolean
 
 
-class LoginDisconnect(Packet, kw_only=True):
-    """Packet representing login disconnect."""
+class Compress(Packet, kw_only=True):
+    """Packet representing Compress."""
 
-    __state__: ClassVar[State] = State.LOGIN
-    __direction__: ClassVar[Direction] = Direction.CLIENTBOUND
+    __packet_name__: ClassVar[str] = "login:clientbound:compress"
 
-    packet_id: ClassVar[VarInt] = 0x00
+    threshold: VarInt
 
-    reason: JsonTextComponent
+
+class LoginPluginRequest(Packet, kw_only=True):
+    """Packet representing LoginPluginRequest."""
+
+    __packet_name__: ClassVar[str] = "login:clientbound:login_plugin_request"
+
+    message_id: VarInt
+    channel: String
+    data: RestBuffer
+
+
+class CookieRequest(Packet, kw_only=True):
+    """Packet representing CookieRequest."""
+
+    __packet_name__: ClassVar[str] = "login:clientbound:cookie_request"

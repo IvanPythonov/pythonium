@@ -1,20 +1,20 @@
 from typing import Annotated, ClassVar
 
-from pythonium.engine.codecs import (
-    NBTCodec,
-)
 from pythonium.engine.codecs.array import ArrayCodec
 from pythonium.engine.codecs.custom import StringCodec
+from pythonium.engine.codecs.nbt import NBTCodec
 from pythonium.engine.codecs.optional import OptionalCodec
-from pythonium.engine.enums import Direction, State
-from pythonium.engine.packets import Packet
+from pythonium.engine.packets.base import Packet
 from pythonium.engine.types import (
     Identifier,
     Int,
     Long,
     NBTCompound,
+    RestBuffer,
+    String,
+    StringArray,
+    TagArray,
     TextComponent,
-    VarInt,
 )
 
 type IdentifierNBT = Annotated[
@@ -23,55 +23,143 @@ type IdentifierNBT = Annotated[
 ]
 
 
-class PingConfiguration(Packet, kw_only=True):
-    """Packet representing pong configuration."""
+class CookieRequest(Packet, kw_only=True):
+    """Packet representing CookieRequest."""
 
-    __state__: ClassVar[State] = State.CONFIGURATION
-    __direction__: ClassVar[Direction] = Direction.CLIENTBOUND
-
-    packet_id: ClassVar[VarInt] = 0x05
-
-    id_: Int
+    __packet_name__: ClassVar[str] = "configuration:clientbound:cookie_request"
 
 
-class KeepAliveConfigurationResponse(Packet, kw_only=True):
-    """Packet representing keep alive configuration."""
+class CustomPayload(Packet, kw_only=True):
+    """Packet representing CustomPayload."""
 
-    __state__: ClassVar[State] = State.CONFIGURATION
-    __direction__: ClassVar[Direction] = Direction.CLIENTBOUND
+    __packet_name__: ClassVar[str] = "configuration:clientbound:custom_payload"
 
-    packet_id: ClassVar[VarInt] = 0x04
-
-    keep_alive_id: Long
+    channel: String
+    data: RestBuffer
 
 
-class ConfigurationDisconnect(Packet, kw_only=True):
-    """Packet representing disconnect."""
+class Disconnect(Packet, kw_only=True):
+    """Packet representing Disconnect."""
 
-    __state__: ClassVar[State] = State.CONFIGURATION
-    __direction__: ClassVar[Direction] = Direction.CLIENTBOUND
-
-    packet_id: ClassVar[VarInt] = 0x02
+    __packet_name__: ClassVar[str] = "configuration:clientbound:disconnect"
 
     reason: TextComponent
 
 
+class FinishConfiguration(Packet, kw_only=True):
+    """Packet representing FinishConfiguration."""
+
+    __packet_name__: ClassVar[str] = (
+        "configuration:clientbound:finish_configuration"
+    )
+
+
+class KeepAlive(Packet, kw_only=True):
+    """Packet representing KeepAlive."""
+
+    __packet_name__: ClassVar[str] = "configuration:clientbound:keep_alive"
+
+    keep_alive_id: Long
+
+
+class Ping(Packet, kw_only=True):
+    """Packet representing Ping."""
+
+    __packet_name__: ClassVar[str] = "configuration:clientbound:ping"
+
+    id_: Int
+
+
+class ResetChat(Packet, kw_only=True):
+    """Packet representing ResetChat."""
+
+    __packet_name__: ClassVar[str] = "configuration:clientbound:reset_chat"
+
+
 class RegistryData(Packet, kw_only=True):
-    """Packet representing registry data."""
+    """Packet representing RegistryData."""
 
-    __state__: ClassVar[State] = State.CONFIGURATION
-    __direction__: ClassVar[Direction] = Direction.CLIENTBOUND
-
-    packet_id: ClassVar[VarInt] = 0x07
+    __packet_name__: ClassVar[str] = "configuration:clientbound:registry_data"
 
     registry_id: Identifier
     entries: IdentifierNBT
 
 
-class FinishConfiguration(Packet, kw_only=True):
-    """Packet representing finish configuration."""
+class RemoveResourcePack(Packet, kw_only=True):
+    """Packet representing RemoveResourcePack."""
 
-    __state__: ClassVar[State] = State.CONFIGURATION
-    __direction__: ClassVar[Direction] = Direction.CLIENTBOUND
+    __packet_name__: ClassVar[str] = (
+        "configuration:clientbound:remove_resource_pack"
+    )
 
-    packet_id: ClassVar[VarInt] = 0x03
+
+class AddResourcePack(Packet, kw_only=True):
+    """Packet representing AddResourcePack."""
+
+    __packet_name__: ClassVar[str] = (
+        "configuration:clientbound:add_resource_pack"
+    )
+
+
+class StoreCookie(Packet, kw_only=True):
+    """Packet representing StoreCookie."""
+
+    __packet_name__: ClassVar[str] = "configuration:clientbound:store_cookie"
+
+
+class Transfer(Packet, kw_only=True):
+    """Packet representing Transfer."""
+
+    __packet_name__: ClassVar[str] = "configuration:clientbound:transfer"
+
+
+class FeatureFlags(Packet, kw_only=True):
+    """Packet representing FeatureFlags."""
+
+    __packet_name__: ClassVar[str] = "configuration:clientbound:feature_flags"
+
+    features: StringArray
+
+
+class Tags(Packet, kw_only=True):
+    """Packet representing Tags."""
+
+    __packet_name__: ClassVar[str] = "configuration:clientbound:tags"
+
+    tags: TagArray
+
+
+class SelectKnownPacks(Packet, kw_only=True):
+    """Packet representing SelectKnownPacks."""
+
+    __packet_name__: ClassVar[str] = (
+        "configuration:clientbound:select_known_packs"
+    )
+
+
+class CustomReportDetails(Packet, kw_only=True):
+    """Packet representing CustomReportDetails."""
+
+    __packet_name__: ClassVar[str] = (
+        "configuration:clientbound:custom_report_details"
+    )
+
+
+class ServerLinks(Packet, kw_only=True):
+    """Packet representing ServerLinks."""
+
+    __packet_name__: ClassVar[str] = "configuration:clientbound:server_links"
+
+
+class ClearDialog(Packet, kw_only=True):
+    """Packet representing ClearDialog."""
+
+    __packet_name__: ClassVar[str] = "configuration:clientbound:clear_dialog"
+
+
+class ShowDialog(Packet, kw_only=True):
+    """Packet representing ShowDialog."""
+
+    __packet_name__: ClassVar[str] = "configuration:clientbound:show_dialog"
+
+    dialog: NBTCompound

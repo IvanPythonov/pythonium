@@ -1,38 +1,43 @@
 from typing import ClassVar
 
-from pythonium.engine.enums import Direction, State
-from pythonium.engine.packets import Packet
-from pythonium.engine.types import UUID, String, VarInt
+from pythonium.engine.packets.base import Packet
+from pythonium.engine.types import UUID, RestBuffer, String, VarInt
 
 
 class LoginStart(Packet, kw_only=True):
-    """Packet representing login start."""
+    """Packet representing LoginStart."""
 
-    __state__: ClassVar[State] = State.LOGIN
-    __direction__: ClassVar[Direction] = Direction.SERVERBOUND
+    __packet_name__: ClassVar[str] = "login:serverbound:login_start"
 
-    packet_id: ClassVar[VarInt] = 0x00
+    username: String
+    player_uuid: UUID
 
-    name: String
-    uuid: UUID
+
+class EncryptionBegin(Packet, kw_only=True):
+    """Packet representing EncryptionBegin."""
+
+    __packet_name__: ClassVar[str] = "login:serverbound:encryption_begin"
+
+    shared_secret: bytes
+    verify_token: bytes
+
+
+class LoginPluginResponse(Packet, kw_only=True):
+    """Packet representing LoginPluginResponse."""
+
+    __packet_name__: ClassVar[str] = "login:serverbound:login_plugin_response"
+
+    message_id: VarInt
+    data: RestBuffer
 
 
 class LoginAcknowledged(Packet, kw_only=True):
-    """Packet representing login acknowledged."""
+    """Packet representing LoginAcknowledged."""
 
-    __state__: ClassVar[State] = State.LOGIN
-    __direction__: ClassVar[Direction] = Direction.SERVERBOUND
-
-    packet_id: ClassVar[VarInt] = 0x03
+    __packet_name__: ClassVar[str] = "login:serverbound:login_acknowledged"
 
 
-class LoginCustomPayload(Packet, kw_only=True):
-    """Packet representing login custom payload."""
+class CookieResponse(Packet, kw_only=True):
+    """Packet representing CookieResponse."""
 
-    __state__: ClassVar[State] = State.LOGIN
-    __direction__: ClassVar[Direction] = Direction.SERVERBOUND
-
-    packet_id: ClassVar[VarInt] = 0x02
-
-    brand: String
-    data: String
+    __packet_name__: ClassVar[str] = "login:serverbound:cookie_response"

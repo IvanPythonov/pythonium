@@ -4,30 +4,44 @@ import secrets
 from logging import getLogger
 
 from pythonium.engine import Client, Router
+from pythonium.engine.codecs.world import WorldStateStruct
 from pythonium.engine.enums import State
 from pythonium.engine.enums.teleport_flags import TeleportFlags
-from pythonium.engine.packets import (
-    AcknowledgeFinishConfiguration,
-    ClientInformation,
-    ConfigurationCustomPayload,
-    FinishConfiguration,
-    KeepAliveConfigurationRequest,
-    KeepAliveConfigurationResponse,
-    Login,
-    PingConfiguration,
-    PongConfiguration,
-    SetDefaultSpawnPosition,
-    SynchronizePlayerPosition,
+from pythonium.engine.packets.ingoing.configuration import (
+    CustomPayload,
+    Pong,
+    Settings,
 )
+from pythonium.engine.packets.ingoing.configuration import (
+    FinishConfiguration as FinishConfigurationRequest,
+)
+from pythonium.engine.packets.ingoing.configuration import (
+    KeepAlive as KeepAliveRequest,
+)
+from pythonium.engine.packets.outgoing.configuration import (
+    FinishConfiguration as FinishConfigurationAcknowledge,
+)
+from pythonium.engine.packets.outgoing.configuration import (
+    KeepAlive as KeepAliveResponse,
+)
+from pythonium.engine.packets.outgoing.configuration import (
+    Ping,
+)
+from pythonium.engine.packets.outgoing.play import (
+    Login,
+    Position,
+    SpawnPosition,
+)
+from pythonium.engine.properties_reader import Properties
 from pythonium.registries.registries_storage import REGISTRY_PACKETS
 
 logger = getLogger(__name__)
 router = Router(name=__name__)
 
 
-@router.on(ClientInformation)
+@router.on(Settings)
 async def on_client_information(
-    client_information: ClientInformation, client: Client
+    client_information: Settings, client: Client
 ) -> None:
     client.session.locale = client_information.locale
     client.session.view_distance = client_information.view_distance
@@ -50,73 +64,79 @@ async def on_client_information(
 
     await client.send_many(
         *REGISTRY_PACKETS,
-        PingConfiguration(
+        Ping(
             id_=secrets.randbelow(2**31 - 1),
         ),
     )
     return None
 
 
-@router.on(KeepAliveConfigurationRequest)
-async def on_login(
-    keep_alive: KeepAliveConfigurationRequest, client: Client
-) -> None:
+@router.on(KeepAliveRequest)
+async def on_login(keep_alive: KeepAliveRequest, client: Client) -> None:
     await client.send(
-        KeepAliveConfigurationResponse(keep_alive_id=keep_alive.keep_alive_id)
+        KeepAliveResponse(keep_alive_id=keep_alive.keep_alive_id)
     )
 
 
-@router.on(PongConfiguration)
-async def on_pong(_pong: PongConfiguration, client: Client) -> None:
-    await client.send(FinishConfiguration())
+@router.on(Pong)
+async def on_pong(_pong: Pong, client: Client) -> None:
+    await client.send(FinishConfigurationRequest())
 
 
-@router.on(ConfigurationCustomPayload)
+@router.on(CustomPayload)
 async def on_payload(
-    payload: ConfigurationCustomPayload,
+    payload: CustomPayload,
 ) -> None:
     pass
 
 
-@router.on(AcknowledgeFinishConfiguration)
+@router.on(FinishConfigurationAcknowledge)
 async def on_finish_configuration(
-    _payload: AcknowledgeFinishConfiguration, client: Client
+    _payload: FinishConfigurationAcknowledge,
+    client: Client,
+    properties: Properties,
 ) -> None:
     client.session.state = State.PLAY
 
     await client.send_many(
         Login(
             entity_id=1,
-            is_hardcore=False,
-            dimension_names=["minecraft:overworld"],
-            max_players=100,
-            view_distance=10,
-            simulation_distance=10,
+            is_hardcore=properties.world.hardcore,
+            world_names=["minecraft:overworld"],
+            max_players=properties.server.max_players,
+            view_distance=properties.performance.view_distance,
+            simulation_distance=properties.performance.simulation_distance,
             reduced_debug_info=False,
             enable_respawn_screen=True,
             do_limited_crafting=False,
-            dimension_type=0,
-            dimension_name="minecraft:overworld",
-            hashed_seed=0,
-            game_mode=0,
-            previous_game_mode=-1,
-            is_debug=False,
-            is_flat=False,
-            has_death_location=False,
-            portal_cooldown=0,
+            world_state=WorldStateStruct(
+                dimension_type=0,
+                dimension_name="minecraft:overworld",
+                hashed_seed=0,
+                game_mode=0,
+                previous_game_mode=0,
+                is_debug=False,
+                is_flat=False,
+                has_death_location=False,
+                death_dimension_name=None,
+                death_location=None,
+                portal_cooldown=3,
+                sea_level=1,
+            ),
+            enforces_secure_chat=True,
         ),
-        SetDefaultSpawnPosition(
-            spawn_position=(0, 10, 0),
+        SpawnPosition(
+            location=(0, 10, 0),
             angle=0.0,
         ),
-        SynchronizePlayerPosition(
+        Position(
             teleport_id=0,
             x=0,
             y=10,
             z=10,
-            velocity_x=0.0,
-            velocity_y=0.0,
-            velocity_z=0.0,
+            dx=0.0,
+            dy=0.0,
+            dz=0.0,
             yaw=0.0,
             pitch=0.0,
             flags=TeleportFlags.relative_pitch,

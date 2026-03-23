@@ -3,13 +3,13 @@ from nbtlib import String
 from pythonium.engine.client.connection import ClientConnection
 from pythonium.engine.client.session import ClientSession
 from pythonium.engine.enums.states import State
-from pythonium.engine.exceptions import PacketNotFoundError
-from pythonium.engine.packets import (
+from pythonium.engine.exceptions import KickError
+from pythonium.engine.packets.base import Packet, serialize
+from pythonium.engine.packets.outgoing import (
     ConfigurationDisconnect,
     LoginDisconnect,
     PlayDisconnect,
 )
-from pythonium.engine.packets.base import Packet, serialize
 
 
 class Client:
@@ -35,7 +35,10 @@ class Client:
             case State.PLAY:
                 packet = PlayDisconnect(reason=reason_payload)
             case _:
-                raise PacketNotFoundError(state=self.session.state)
+                raise KickError(
+                    info="Wrong state (maybe status).",
+                    state=self.session.state,
+                )
 
         await self.connection.write(serialize(packet))
 

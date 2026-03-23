@@ -6,8 +6,12 @@ from msgspec.json import encode
 
 from pythonium.engine.codecs.base import Codec
 from pythonium.engine.codecs.nbt import NBTCodec
-from pythonium.engine.codecs.primitives import LongCodec
-from pythonium.engine.exceptions import DecodeError, VarIntDecodeError
+from pythonium.engine.codecs.primitives import DoubleCodec, LongCodec
+from pythonium.engine.exceptions import (
+    DecodeError,
+    EncodeError,
+    VarIntDecodeError,
+)
 from pythonium.engine.typealiases import Deserialized
 
 SEGMENT_BITS: Final[int] = 0x7F
@@ -162,3 +166,47 @@ class JsonTextComponentCodec(Codec[str]):
 
     def deserialize(self, data: bytes) -> Deserialized[str]:
         return StringCodec().deserialize(data=data)
+
+
+class FixedByteArrayCodec(Codec[bytes]):
+    """Codec for Fixed Byte Array."""
+
+    def __init__(self, length: int) -> None:
+        self.length = length
+
+    def serialize(self, *, field: bytes) -> bytes:
+        if len(field) != self.length:
+            raise EncodeError(
+                info=f"Expected {self.length} bytes, got {len(field)}"
+            )
+        return field
+
+    def deserialize(self, data: bytes) -> Deserialized[bytes]:
+        if len(data) < self.length:
+            raise DecodeError(data=data)
+        return data[: self.length], self.length
+
+
+class DoubleVectorCodec(Codec[tuple[float, float, float]]):
+    """Codec for a 3D Double Vector (X, Y, Z)."""
+
+    def __init__(self) -> None:
+        self.double_codec = DoubleCodec()
+
+    def serialize(self, *, field: tuple[float, float, float]) -> bytes:
+        x, y, z = field
+        return b"".join(
+            [
+                self.double_codec.serialize(field=x),
+                self.double_codec.serialize(field=y),
+                self.double_codec.serialize(field=z),
+            ]
+        )
+
+    def deserialize(
+        self, data: bytes
+    ) -> Deserialized[tuple[float, float, float]]:
+        x, c1 = self.double_codec.deserialize(data)
+        y, c2 = self.double_codec.deserialize(data[c1:])
+        z, c3 = self.double_codec.deserialize(data[c1 + c2 :])
+        return (x, y, z), c1 + c2 + c3

@@ -1,12 +1,12 @@
 """Handshake Phase Router."""
 
 from pythonium.engine import Client, Router
-from pythonium.engine.enums import State
-from pythonium.engine.packets import Handshake
+from pythonium.engine.enums import NextState
+from pythonium.engine.packets.ingoing import SetProtocol
 
 router = Router(name=__name__)
 
 
-@router.on(Handshake)
-async def on_handshake(handshake: Handshake, client: Client) -> None:
-    client.session.state = State(handshake.next_state + 1)
+@router.on(SetProtocol)
+async def on_handshake(handshake: SetProtocol, client: Client) -> None:
+    client.session.state = NextState(handshake.next_state)

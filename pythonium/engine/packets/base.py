@@ -19,6 +19,7 @@ from pythonium.engine.field import Field
 from pythonium.engine.formatter import format_packet
 from pythonium.engine.packets.packet_storage import PacketStorage
 from pythonium.engine.types import VarInt
+from pythonium.registries.protocol_storage import get_data_by_packet_name
 
 _VARINT_CODEC = VarIntCodec()
 _STRING_CODEC = StringCodec()
@@ -30,27 +31,30 @@ logger = logging.getLogger(name=__name__)
 class Packet(Struct, kw_only=True):
     """Base packet."""
 
+    __packet_name__: ClassVar[str]
+
     __schema_as_json__: ClassVar[bool] = False
     __schema_cache__: ClassVar[list[Field] | None] = None
 
-    __state__: ClassVar[State]
-    __direction__: ClassVar[Direction]
+    state: ClassVar[State]
+    direction: ClassVar[Direction]
 
     packet_id: ClassVar[VarInt]
 
     def __init_subclass__(cls) -> None:
         super().__init_subclass__()
 
-        required_attrs = (
-            "packet_id",
-            "__state__",
-            "__direction__",
+        if not hasattr(cls, "__packet_name__"):
+            msg = f"{cls.__name__} must define `__packet_name__`"
+            raise NotImplementedError(msg)
+
+        state, direction, packet_id = get_data_by_packet_name(
+            packet_name=cls.__packet_name__
         )
 
-        for attr in required_attrs:
-            if not hasattr(cls, attr):
-                msg = f"{cls.__name__} must define `{attr}`"
-                raise NotImplementedError(msg)
+        cls.state = state
+        cls.direction = direction
+        cls.packet_id = packet_id
 
         PacketStorage.add(packet=cls)
 
