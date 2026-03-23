@@ -9,7 +9,5 @@ wheels/
 # Virtual environments
 .venv
 .python_version
-*.lock
-uv.lock
 
 .vscode

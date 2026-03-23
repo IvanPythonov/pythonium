@@ -40,7 +40,7 @@ docker compose up -d
 
 - **Protocol 772 Support**: Full compatibility with Minecraft 1.21.8.
 - **Extreme Serialization**: Powered by `msgspec` for near-instant binary packet processing.
-- **Asynchronous Core**: Built on `asyncio` with `uvloop` (Linux) or `winloop` (Windows) for maximum throughput.
+- **Asynchronous Core**: Built on `asyncio` with `uvloop` (Linux) for maximum throughput.
 - **Type-Safe**: Leveraging Python 3.14+ features like `Generic Type Aliases` and `Annotated` types.
 - **Modular Routing**: Clean, FastAPI-inspired routing system with built-in Dependency Injection.
 
