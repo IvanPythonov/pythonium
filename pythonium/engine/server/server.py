@@ -98,18 +98,16 @@ class Server:
                 await self.router.route(
                     packet,
                     client=client,
-                    ticker=self.ticker,
-                    properties=self.properties,
-                    world=self.world,
                 )
             except Exception as e:
+                error = f"Internal Server Error."
                 if self.properties.server.debug:
-                    await client.kick(str(e))
-                logger.exception("Packet handle error")
+                    error += f"\n\u00a7c Details: {e!r}"
+                await client.kick(error)
 
         self.remove_client(client)
         logger.info("Disconnected from %s", address)
-        await client.connection.disconnect()
+        await client.disconnect()
 
     async def serve(self) -> None:
         logger.info(
@@ -123,6 +121,12 @@ class Server:
             self._handle_connection,
             self.properties.server.host,
             self.properties.server.port,
+        )
+
+        self.router.bake(
+            ticker=self.ticker,
+            properties=self.properties,
+            world=self.world,
         )
 
         await gather(ticker, server)

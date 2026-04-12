@@ -48,8 +48,9 @@ class Client:
             )
 
         packet = packet_factory(reason)
+
         await self.send(packet)
-        await self.connection.disconnect()
+        await self.disconnect()
 
     async def send(self, packet: Packet) -> None:
         await self.connection.write(serialize(packet))
@@ -57,3 +58,6 @@ class Client:
     async def send_many(self, *packets: Packet) -> None:
         for packet in packets:
             await self.send(packet=packet)
+
+    async def disconnect(self) -> None:
+        await self.connection.disconnect()

@@ -18,7 +18,7 @@ from pythonium.engine.types import (
 )
 
 type IdentifierNBT = Annotated[
-    list[tuple[str, dict[str, NBTCompound | None]]],
+    list[tuple[str, NBTCompound | None]],
     ArrayCodec((StringCodec(), OptionalCodec(NBTCodec()))),
 ]
 

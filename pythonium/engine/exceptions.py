@@ -62,3 +62,11 @@ class KickError(PacketNotFoundError):
     message = (
         PacketNotFoundError.message.removesuffix(".") + ", kick is impossible."
     )
+
+
+class PacketNotHandledError(PacketNotFoundError):
+    """Exception raised when a packet is not handled."""
+
+    message = (
+        PacketNotFoundError.message.removesuffix(".") + ", no handler found."
+    )

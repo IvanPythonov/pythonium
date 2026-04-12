@@ -58,6 +58,7 @@ from pythonium.engine.codecs.custom import (
     DoubleVectorCodec,
     FixedByteArrayCodec,
     JsonTextComponentCodec,
+    PrefixedByteArrayCodec,
     TextComponentCodec,
 )
 from pythonium.engine.codecs.equipment import (
@@ -115,6 +116,7 @@ from pythonium.engine.codecs.sound_event import (
     SoundEventStruct,
 )
 from pythonium.engine.codecs.statistics import StatisticCodec, StatisticStruct
+from pythonium.engine.codecs.tag import RegistryTagsCodec, RegistryTagsStruct
 from pythonium.engine.codecs.teams import UpdateTeamCodec, UpdateTeamStruct
 from pythonium.engine.codecs.trade import TradeCodec, TradeStruct
 from pythonium.engine.codecs.update_recipes import (
@@ -198,11 +200,6 @@ type JsonTextComponent = Annotated[str, JsonTextComponentCodec()]
 type Slot = Annotated[SlotStruct, SlotCodec()]
 
 type SlotArray = Annotated[list[SlotStruct], ArrayCodec(SlotCodec())]
-
-type TagArray = Annotated[
-    list[tuple[str, VarIntArray]],
-    ArrayCodec((StringCodec(), ArrayCodec(VarIntCodec()))),
-]
 
 type Recipe = Annotated[RecipeStruct, RecipeCodec()]
 type RecipeArray = Annotated[list[RecipeStruct], ArrayCodec(RecipeCodec())]
@@ -305,8 +302,7 @@ type BlockParticleAlternativeArray = Annotated[
     list[BlockParticleAlternativeStruct],
     ArrayCodec(BlockParticleAlternativeCodec()),
 ]
-
-type HeightmapsArray = Annotated[list[NBTCompound], ArrayCodec(NBTCodec())]
+type PrefixedByteArray = Annotated[bytes, PrefixedByteArrayCodec()]
 
 type BlockEntityArray = Annotated[
     list[BlockEntityStruct], ArrayCodec(BlockEntityCodec())
@@ -340,4 +336,8 @@ type UpdateTeamData = Annotated[UpdateTeamStruct, UpdateTeamCodec()]
 
 type PlayerInfoUpdateData = Annotated[
     PlayerInfoUpdateStruct, PlayerInfoUpdateCodec()
+]
+
+type TagArray = Annotated[
+    list[RegistryTagsStruct], ArrayCodec(RegistryTagsCodec())
 ]

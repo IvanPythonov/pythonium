@@ -210,3 +210,12 @@ class DoubleVectorCodec(Codec[tuple[float, float, float]]):
         y, c2 = self.double_codec.deserialize(data[c1:])
         z, c3 = self.double_codec.deserialize(data[c1 + c2 :])
         return (x, y, z), c1 + c2 + c3
+
+
+class PrefixedByteArrayCodec(Codec[bytes]):
+    def serialize(self, *, field: bytes) -> bytes:
+        return VarIntCodec().serialize(field=len(field)) + field
+
+    def deserialize(self, data: bytes) -> Deserialized[bytes]:
+        length, offset = VarIntCodec().deserialize(data)
+        return data[offset : offset + length], offset + length

@@ -26,8 +26,9 @@ async def on_login(
     if not properties.auth.online_mode:
         player_uuid = str(
             UUID(
-                bytes=hashlib.md5(  # noqa: S324
-                    f"OfflinePlayer:{login_start.username}".encode()
+                bytes=hashlib.md5(
+                    f"OfflinePlayer:{login_start.username}".encode(),
+                    usedforsecurity=False,
                 ).digest()[:16],
                 version=3,
             )

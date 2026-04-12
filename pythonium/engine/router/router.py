@@ -1,24 +1,11 @@
-import inspect
-from collections.abc import Awaitable, Callable
-from functools import cache
+from collections.abc import Callable
 from typing import Any, Self
 
-from pythonium.engine.packets import Packet
-
-type Handler = Callable[..., Awaitable[None]]
-
-
-@cache
-def _get_func_params(func: Handler) -> frozenset[str]:
-    return frozenset(inspect.signature(func).parameters.keys())
-
-
-def _resolve_kwargs(
-    current_kwargs: dict[str, Any], func: Handler
-) -> dict[str, Any]:
-    sig_params = _get_func_params(func)
-
-    return {k: current_kwargs[k] for k in sig_params if k in current_kwargs}
+from pythonium.engine.enums.states import State
+from pythonium.engine.exceptions import PacketNotHandledError
+from pythonium.engine.packets.base import Packet
+from pythonium.engine.router.struct import HandlerStruct
+from pythonium.engine.typealiases import Handler
 
 
 class Router:
@@ -31,30 +18,34 @@ class Router:
 
         self._parent_router: Router | None = None
         self.sub_routers: list[Router] = []
-        self._commands: dict[tuple[int, int], Handler] = {}
+
+        self._unbaked_handlers: dict[type[Packet], Handler] = {}
+        self._baked_handlers: dict[tuple[State, int], HandlerStruct] = {}
 
         self._kwargs = kwargs
 
-    def on(self, *commands_type: type[Packet]) -> Callable[[Handler], Handler]:
+    def on(self, *packets: type[Packet]) -> Callable[[Handler], Handler]:
         def decorator(
             func: Handler,
         ) -> Handler:
-            for command_type in commands_type:
-                self._commands[
-                    (command_type.state, command_type.packet_id)
-                ] = func
+            for packet in packets:
+                self._unbaked_handlers[packet] = func
             return func
 
         return decorator
 
     @property
-    def commands(self) -> dict[tuple[int, int], Handler]:
-        return self._commands
+    def handlers(self) -> dict[tuple[State, int], HandlerStruct]:
+        return self._baked_handlers
 
     @property
-    def all_commands(self) -> dict[tuple[int, int], Handler]:
+    def unbaked_handlers(self) -> dict[type[Packet], Handler]:
+        return self._unbaked_handlers
+
+    @property
+    def all_commands(self) -> dict[tuple[State, int], HandlerStruct]:
         """Get all commands from this router and sub-routers."""
-        commands = self._commands.copy()
+        commands = self._baked_handlers.copy()
         for sub_router in self.sub_routers:
             commands.update(sub_router.all_commands)
         return commands
@@ -98,7 +89,7 @@ class Router:
         for router in routers:
             self.include_router(router)
 
-    def include_router(self, router: "Router") -> "Router":  # pyright: ignore[reportUndefinedVariable]
+    def include_router(self, router: "Router") -> "Router":
         """Attach another router."""
         if not isinstance(router, Router):
             msg = (
@@ -106,26 +97,35 @@ class Router:
                 f"Router not {type(router).__class__.__name__}"
             )
             raise TypeError(msg)
+
         router.parent_router = self
-        self._commands.update(router.commands)
+        self._unbaked_handlers.update(router.unbaked_handlers)
+
         return self
+
+    def bake(self, **static_kwargs: Any) -> None:  # noqa: ANN401
+        """Bake handlers, resolving kwargs."""
+        for packet, func in self._unbaked_handlers.items():
+            handler_struct = HandlerStruct(func=func, kwargs=static_kwargs)
+
+            self._baked_handlers[(packet.state, packet.packet_id)] = (
+                handler_struct
+            )
 
     async def route(self, packet: Packet, **kwargs: object) -> None:
         """Route command to appropriate handler."""
-        func = self.resolve_router(packet=type(packet))
+        handler_struct = self.resolve_router(packet=type(packet))
 
-        if func is None:
-            return None
+        if handler_struct is None:
+            raise PacketNotHandledError(
+                packet_name=type(packet).__name__,
+            )
 
-        kwargs = _resolve_kwargs(
-            current_kwargs=kwargs | self._kwargs, func=func
-        )
+        return await handler_struct(packet, **kwargs)
 
-        return await func(packet, **kwargs)
-
-    def resolve_router(self, packet: type[Packet]) -> Handler | None:
+    def resolve_router(self, packet: type[Packet]) -> HandlerStruct | None:
         packet_id = (packet.state, packet.packet_id)
 
-        if packet_id in self._commands:
-            return self._commands[packet_id]
+        if packet_id in self._baked_handlers:
+            return self._baked_handlers[packet_id]
         return None

@@ -46,7 +46,7 @@ def _format_value(value: Any, level: int = 0) -> str:  # noqa: ANN401, C901, PLR
         )
 
     if isinstance(value, bytes):
-        snippet = repr(value[:32]) + ("..." if len(value) > 32 else "")
+        snippet = repr(value[:32]) + ("..." if len(value) > 32 else "")  # noqa: PLR2004
         return (
             f"{Colors.BLUE}{snippet}{Colors.RESET}"
             f" {Colors.GRAY}(len={len(value)}){Colors.RESET}"

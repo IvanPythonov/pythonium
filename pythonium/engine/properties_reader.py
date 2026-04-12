@@ -31,7 +31,7 @@ class WorldProperties(KebabStruct):
 
     gamemode: Literal["survival", "creative", "adventure", "spectator"]
     difficulty: Literal["peaceful", "easy", "normal", "hard"]
-    seed: str
+    seed: int
     hardcore: bool
 
 

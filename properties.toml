@@ -25,7 +25,7 @@ gamemode = "survival"
 # peaceful (for the normies), easy, normal, hard
 difficulty = "normal"
 # world seed. Leave it empty ("") to let rngesus cook, or paste your god seed here
-seed = ""
+seed = 0
 # hardcore mode. (perma-spectator, no respawn fr fr)
 hardcore = false
 

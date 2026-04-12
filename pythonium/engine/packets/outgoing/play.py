@@ -17,7 +17,6 @@ from pythonium.engine.types import (
     Double,
     EquipmentArray,
     Float,
-    HeightmapsArray,
     Identifier,
     IdentifierArray,
     Int,
@@ -39,6 +38,7 @@ from pythonium.engine.types import (
     OptionalVarInt,
     ParticleData,
     PlayerInfoUpdateData,
+    PrefixedByteArray,
     PrefixedOptionalNumberFormat,
     PrefixedOptionalTextComponent,
     PrefixedOptionalWaypointColor,
@@ -55,6 +55,7 @@ from pythonium.engine.types import (
     StonecutterRecipeArray,
     String,
     StringArray,
+    TagArray,
     TextComponent,
     TradeArray,
     UByte,
@@ -497,15 +498,10 @@ class MapChunk(Packet, kw_only=True):
 
     x: Int
     z: Int
-    heightmaps: HeightmapsArray
-    chunk_data: ByteArray
+    heightmaps: NBTCompound
+    chunk_data: PrefixedByteArray
     block_entities: BlockEntityArray
-    sky_light_mask: LongArray
-    block_light_mask: LongArray
-    empty_sky_light_mask: LongArray
-    empty_block_light_mask: LongArray
-    sky_light: LightData
-    block_light: LightData
+    light_data: LightData
 
 
 class WorldEvent(Packet, kw_only=True):
@@ -1401,7 +1397,7 @@ class Tags(Packet, kw_only=True):
 
     __packet_name__: ClassVar[str] = "play:clientbound:tags"
 
-    tags: IdentifierArray
+    tags: TagArray
 
 
 class SetProjectilePower(Packet, kw_only=True):
