@@ -1,6 +1,5 @@
 from typing import ClassVar
 
-from pythonium.engine.enums.teleport_flags import TeleportFlags
 from pythonium.engine.packets.base import Packet
 from pythonium.engine.types import (
     UUID,

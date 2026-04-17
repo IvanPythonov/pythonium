@@ -11,6 +11,9 @@ class ClientSession(Struct):
 
     state: State = State.HANDSHAKING
 
+    uuid: str | None = None
+    username: str | None = None
+
     locale: str | None = None
     chat_mode: int | None = None
     chat_colors: bool | None = None

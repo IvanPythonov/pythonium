@@ -213,9 +213,22 @@ class DoubleVectorCodec(Codec[tuple[float, float, float]]):
 
 
 class PrefixedByteArrayCodec(Codec[bytes]):
+    """Codec for a byte array prefixed with its length as a VarInt."""
+
     def serialize(self, *, field: bytes) -> bytes:
         return VarIntCodec().serialize(field=len(field)) + field
 
     def deserialize(self, data: bytes) -> Deserialized[bytes]:
         length, offset = VarIntCodec().deserialize(data)
         return data[offset : offset + length], offset + length
+
+
+class PrefixedLongByteArrayCodec(Codec[bytes]):
+    """Codec for a byte array prefixed with its length as a VarInt."""
+
+    def serialize(self, *, field: bytes) -> bytes:
+        return VarIntCodec().serialize(field=len(field)) + field
+
+    def deserialize(self, data: bytes) -> Deserialized[bytes]:
+        byte_len, offset = VarIntCodec().deserialize(data)
+        return data[offset : offset + byte_len], offset + byte_len

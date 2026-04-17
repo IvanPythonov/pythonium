@@ -34,6 +34,9 @@ async def on_login(
             )
         )
 
+    client.session.uuid = player_uuid
+    client.session.username = login_start.username
+
     await client.send(
         Success(uuid=player_uuid, name=login_start.username, is_legacy=False)
     )

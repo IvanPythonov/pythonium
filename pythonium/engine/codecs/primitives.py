@@ -68,7 +68,7 @@ class LongCodec(PrimitiveCodec[int]):
     Signed 64-bit integer, two's complement.
     """
 
-    __format_character__ = ">q"
+    __format_character__ = ">Q"
 
 
 class FloatCodec(PrimitiveCodec[float]):

@@ -47,6 +47,7 @@ from pythonium.engine.codecs.chunk import (
     BlockEntityStruct,
     ChunkBiomeDataCodec,
     ChunkBiomeDataStruct,
+    HeightmapsCodec,
     LightDataCodec,
     LightDataStruct,
 )
@@ -59,6 +60,7 @@ from pythonium.engine.codecs.custom import (
     FixedByteArrayCodec,
     JsonTextComponentCodec,
     PrefixedByteArrayCodec,
+    PrefixedLongByteArrayCodec,
     TextComponentCodec,
 )
 from pythonium.engine.codecs.equipment import (
@@ -231,6 +233,7 @@ type MapColorPatch = Annotated[MapColorPatchStruct, MapColorPatchCodec()]
 type MinecartStepArray = Annotated[
     list[MinecartStepStruct], ArrayCodec(MinecartStepCodec())
 ]
+type PrefixedLongByteArray = Annotated[bytes, PrefixedLongByteArrayCodec()]
 
 type BossBarActionType = Annotated[BossBarAction, BossBarActionCodec()]
 
@@ -341,3 +344,5 @@ type PlayerInfoUpdateData = Annotated[
 type TagArray = Annotated[
     list[RegistryTagsStruct], ArrayCodec(RegistryTagsCodec())
 ]
+
+type HeightmapData = Annotated[dict[str, list[int]], HeightmapsCodec()]

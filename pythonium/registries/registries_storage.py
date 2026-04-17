@@ -9,8 +9,15 @@ from pythonium.engine.packets.outgoing import RegistryData
 REGISTRIES_FILE = Path(__file__).parent / "registries.json"
 REGISTRIES_NBT = parse_nbt(REGISTRIES_FILE.read_text(encoding="utf-8"))
 
+_PRIMITIVE_FACTORY = {
+    int: Int,
+    float: Double,
+    str: String,
+    bool: lambda v: Byte(1 if v else 0),
+}
 
-def _convert_value(value: Any) -> Base:
+
+def _convert_value(value: Any) -> Base:  # noqa: ANN401
     if isinstance(value, dict):
         return Compound({k: _convert_value(v) for k, v in value.items()})
 
@@ -22,17 +29,8 @@ def _convert_value(value: Any) -> Base:
         list_type = type(converted_list[0])
         return List[list_type](converted_list)
 
-    if isinstance(value, bool):
-        return Byte(1 if value else 0)
-
-    if isinstance(value, int):
-        return Int(value)
-
-    if isinstance(value, float):
-        return Double(value)
-
-    if isinstance(value, str):
-        return String(value)
+    if isinstance(value, (int, float, str, bool)):
+        return _PRIMITIVE_FACTORY[type(value)](value)
 
     if value is None:
         return Compound({})

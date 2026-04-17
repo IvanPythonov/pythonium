@@ -10,13 +10,13 @@ from pythonium.engine.types import (
     Boolean,
     BossBarActionType,
     Byte,
-    ByteArray,
     ChatType,
     ChunkBiomeDataArray,
     CommandMatchArray,
     Double,
     EquipmentArray,
     Float,
+    HeightmapData,
     Identifier,
     IdentifierArray,
     Int,
@@ -38,7 +38,7 @@ from pythonium.engine.types import (
     OptionalVarInt,
     ParticleData,
     PlayerInfoUpdateData,
-    PrefixedByteArray,
+    PrefixedLongByteArray,
     PrefixedOptionalNumberFormat,
     PrefixedOptionalTextComponent,
     PrefixedOptionalWaypointColor,
@@ -498,8 +498,8 @@ class MapChunk(Packet, kw_only=True):
 
     x: Int
     z: Int
-    heightmaps: NBTCompound
-    chunk_data: PrefixedByteArray
+    heightmaps: HeightmapData
+    chunk_data: PrefixedLongByteArray
     block_entities: BlockEntityArray
     light_data: LightData
 

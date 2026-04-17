@@ -5,11 +5,14 @@ import secrets
 from logging import getLogger
 
 from pythonium.engine import Client, Router
-from pythonium.engine.codecs.chunk import LightDataStruct
-from pythonium.engine.codecs.tag import RegistryTagsStruct, TagStruct
+from pythonium.engine.codecs.player_info import (
+    PlayerInfoActionStruct,
+    PlayerInfoUpdateStruct,
+)
 from pythonium.engine.codecs.world import WorldStateStruct
 from pythonium.engine.enums import State
 from pythonium.engine.enums.teleport_flags import TeleportFlags
+from pythonium.engine.exceptions import SuspiciousClientError
 from pythonium.engine.packets.ingoing.configuration import (
     CustomPayload,
     Pong,
@@ -34,17 +37,22 @@ from pythonium.engine.packets.outgoing.configuration import (
 )
 from pythonium.engine.packets.outgoing.play import (
     Abilities,
+    ChunkBatchFinished,
+    ChunkBatchStart,
     Difficulty,
     EntityStatus,
+    GameStateChange,
     HeldItemSlot,
     Login,
     MapChunk,
+    PlayerInfo,
     Position,
-    SpawnPosition,
+    SetTickingState,
     UpdateViewPosition,
 )
 from pythonium.engine.properties_reader import Properties
 from pythonium.registries.registries_storage import REGISTRY_PACKETS
+from pythonium.worldgen.terrain.flat import FlatWorldGenerator
 
 logger = getLogger(__name__)
 router = Router(name=__name__)
@@ -128,11 +136,54 @@ async def on_finish_configuration(
 ) -> None:
     client.session.state = State.PLAY
 
+    if client.session.uuid and client.session.username:
+        player_info = PlayerInfo(
+            player_info=PlayerInfoUpdateStruct(
+                actions_mask=0x01 | 0x04 | 0x08,
+                players=[
+                    PlayerInfoActionStruct(
+                        uuid=client.session.uuid,
+                        name=client.session.username,
+                        properties=[],
+                        game_mode=0,
+                        listed=True,
+                        ping=0,
+                    )
+                ],
+            )
+        )
+    else:
+        raise SuspiciousClientError
+
+    gen = FlatWorldGenerator()
+    chunks: list[MapChunk] = []
+
+    for x in range(-8, 8):
+        for z in range(-8, 8):
+            chunk = gen.generate_chunk(x, z)
+            chunks.append(
+                MapChunk(
+                    x=x,
+                    z=z,
+                    heightmaps={
+                        "MOTION_BLOCKING": [0] * 36,
+                        "WORLD_SURFACE": [0] * 36,
+                    },
+                    chunk_data=chunk.get_chunk_data(),
+                    block_entities=[],
+                    light_data=chunk.get_light_data(),
+                ),
+            )
+
     await client.send_many(
         Login(
             entity_id=1,
             is_hardcore=properties.world.hardcore,
-            world_names=["minecraft:overworld"],
+            world_names=[
+                "minecraft:overworld",
+                "minecraft:the_nether",
+                "minecraft:the_end",
+            ],
             max_players=properties.server.max_players,
             view_distance=properties.performance.view_distance,
             simulation_distance=properties.performance.simulation_distance,
@@ -142,12 +193,11 @@ async def on_finish_configuration(
             world_state=WorldStateStruct(
                 dimension_type=0,
                 dimension_name="minecraft:overworld",
-                hashed_seed=1,
-                # hashed_seed=_seed_hash(seed=properties.world.seed),
+                hashed_seed=_seed_hash(seed=properties.world.seed),
                 game_mode=0,
                 previous_game_mode=0,
                 is_debug=False,
-                is_flat=False,
+                is_flat=True,
                 has_death_location=False,
                 death_dimension_name=None,
                 death_location=None,
@@ -156,20 +206,28 @@ async def on_finish_configuration(
             ),
             enforces_secure_chat=True,
         ),
-        SpawnPosition(
-            location=(0, 10, 0),
-            angle=0.0,
-        ),
+        player_info,
+        SetTickingState(tick_rate=20, is_frozen=False),
         Abilities(flags=0x00, flying_speed=0.05, walking_speed=0.1),
         HeldItemSlot(slot=0),
         Difficulty(difficulty=0, difficulty_locked=True),
         # TODO(IvanPythonov): add difficulty to properties
         EntityStatus(entity_id=1, entity_status=0),
-        UpdateViewPosition(chunk_x=0, chunk_z=0),
+        GameStateChange(reason=13, game_mode=0.0),
+        UpdateViewPosition(chunk_x=0, chunk_z=10 // 32),
+    )
+
+    await client.send_many(
+        ChunkBatchStart(),
+        *chunks,
+        ChunkBatchFinished(batch_size=len(chunks)),
+    )
+
+    await client.send(
         Position(
-            teleport_id=0,
+            teleport_id=secrets.randbelow(2**31 - 1),
             x=0,
-            y=10,
+            y=-50,
             z=10,
             dx=0.0,
             dy=0.0,
@@ -177,20 +235,5 @@ async def on_finish_configuration(
             yaw=0.0,
             pitch=0.0,
             flags=TeleportFlags.relative_pitch,
-        ),
-        MapChunk(
-            x=0,
-            z=0,
-            heightmaps={},
-            chunk_data=b"\0x",
-            block_entities=[],
-            light_data=LightDataStruct(
-                sky_y_mask=[],
-                block_y_mask=[],
-                empty_block_y_mask=[],
-                empty_sky_y_mask=[],
-                sky_updates=[],
-                block_updates=[],
-            ),
         ),
     )

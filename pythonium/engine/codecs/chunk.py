@@ -8,10 +8,52 @@ from pythonium.engine.codecs.nbt import NBTCodec
 from pythonium.engine.codecs.primitives import (
     ByteCodec,
     IntCodec,
+    LongCodec,
     ShortCodec,
     UnsignedByteCodec,
 )
 from pythonium.engine.typealiases import Deserialized
+
+
+class HeightmapsCodec(Codec[dict[str, list[int]]]):
+    """Encodes Heightmaps as Network Map<String, LongArray>."""
+
+    def __init__(self) -> None:
+        self._HEIGHTMAP_TYPES = {
+            "WORLD_SURFACE": 1,
+            "MOTION_BLOCKING": 4,
+            "MOTION_BLOCKING_NO_LEAVES": 5,
+        }
+        self._HEIGHTMAP_TYPES_BY_ID = {
+            value: key for key, value in self._HEIGHTMAP_TYPES.items()
+        }
+        self.varint = VarIntCodec()
+        self.long_array: ArrayCodec = ArrayCodec(LongCodec())
+
+    def serialize(self, *, field: dict[str, list[int]]) -> bytes:
+        out = bytearray()
+        out.extend(self.varint.serialize(field=len(field)))
+
+        for key, longs in field.items():
+            out.extend(self.varint.serialize(field=self._HEIGHTMAP_TYPES[key]))
+            out.extend(self.long_array.serialize(field=longs))
+
+        return bytes(out)
+
+    def deserialize(self, data: bytes) -> Deserialized[dict[str, list[int]]]:
+        length, offset = self.varint.deserialize(data)
+        result: dict[str, list[int]] = {}
+
+        for _ in range(length):
+            type_id, consumed = self.varint.deserialize(data[offset:])
+            offset += consumed
+
+            values, consumed = self.long_array.deserialize(data[offset:])
+            offset += consumed
+
+            result[self._HEIGHTMAP_TYPES_BY_ID[type_id]] = values
+
+        return result, offset
 
 
 class ChunkBiomeDataStruct(Struct):

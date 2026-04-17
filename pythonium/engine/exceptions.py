@@ -4,6 +4,8 @@ from typing import Any, override
 class Error(Exception):
     """Base exception class for all pythonium errors."""
 
+    show_in_production: bool = False
+
     message: str
 
     @override
@@ -70,3 +72,17 @@ class PacketNotHandledError(PacketNotFoundError):
     message = (
         PacketNotFoundError.message.removesuffix(".") + ", no handler found."
     )
+
+
+class ChunkSectionOutOfBoundsError(Error):
+    """Exception raised when a chunk section is out of bounds."""
+
+    message = "Chunk section Y coordinate is out of bounds."
+
+
+class SuspiciousClientError(Error):
+    """Exception raised when a suspicious client is detected."""
+
+    message = "Client has no UUID or username after configuration phase."
+
+    show_in_production = True

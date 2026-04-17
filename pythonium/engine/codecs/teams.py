@@ -36,11 +36,11 @@ class UpdateTeamCodec(Codec[UpdateTeamStruct]):
     """Codec for Teams."""
 
     def __init__(self) -> None:
-        self.string = StringCodec()
-        self.byte = ByteCodec()
-        self.text = TextComponentCodec()
-        self.varint = VarIntCodec()
-        self.string_array = ArrayCodec(self.string)
+        self.string: StringCodec = StringCodec()
+        self.byte: ByteCodec = ByteCodec()
+        self.text: TextComponentCodec = TextComponentCodec()
+        self.varint: VarIntCodec = VarIntCodec()
+        self.string_array: ArrayCodec = ArrayCodec(self.string)
 
     def _serialize_info(self, info: TeamInfoStruct) -> bytes:
         return b"".join(

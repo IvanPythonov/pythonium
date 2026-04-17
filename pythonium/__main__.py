@@ -21,7 +21,7 @@ from pythonium.server.routers.play import router as play_router
 
 
 def setup_async_logging(*, debug: bool) -> None:
-    log_queue = queue.Queue(-1)
+    log_queue: queue.Queue = queue.Queue(-1)
 
     console_handler = logging.StreamHandler(sys.stdout)
     formatter = logging.Formatter(

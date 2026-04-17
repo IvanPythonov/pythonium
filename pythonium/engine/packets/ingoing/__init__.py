@@ -1,5 +1,3 @@
-# Auto-generated __init__.py
-
 from . import configuration, handshaking, login, play, status
 from .configuration import (
     CookieResponse,

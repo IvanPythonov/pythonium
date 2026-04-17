@@ -1,2 +1,4 @@
-- worldgen
+- worldgen (SUCCESS)
 - zerocopy serialization
+- keepalive tasks
+- some architecture refactor

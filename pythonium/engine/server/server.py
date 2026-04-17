@@ -100,10 +100,13 @@ class Server:
                     client=client,
                 )
             except Exception as e:
-                error = f"Internal Server Error."
-                if self.properties.server.debug:
+                error = "Internal Server Error."
+                if self.properties.server.debug or getattr(
+                    e, "show_in_production", False
+                ):
                     error += f"\n\u00a7c Details: {e!r}"
                 await client.kick(error)
+                raise
 
         self.remove_client(client)
         logger.info("Disconnected from %s", address)

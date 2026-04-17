@@ -1,5 +1,3 @@
-# Auto-generated __init__.py
-
 from . import configuration, login, play, status
 from .configuration import (
     AddResourcePack,
