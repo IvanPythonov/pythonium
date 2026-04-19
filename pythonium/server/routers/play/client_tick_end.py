@@ -3,9 +3,11 @@
 from pythonium.engine.packets.ingoing import (
     TickEnd,
 )
-from pythonium.server.routers.play import router as play_router
+from pythonium.engine.router import Router
+
+router = Router(name=__name__)
 
 
-@play_router.on(TickEnd)
+@router.on(TickEnd)
 async def on_tick_end(client_tick_end: TickEnd) -> None:
     pass

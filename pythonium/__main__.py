@@ -15,9 +15,9 @@ from pythonium.server.routers import (
     configuration_router,
     handshake_router,
     login_router,
+    play_router,
     status_router,
 )
-from pythonium.server.routers.play import router as play_router
 
 
 def setup_async_logging(*, debug: bool) -> None:

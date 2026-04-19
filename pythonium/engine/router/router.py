@@ -1,3 +1,4 @@
+import logging
 from collections.abc import Callable
 from typing import Any, Self
 
@@ -6,6 +7,8 @@ from pythonium.engine.exceptions import PacketNotHandledError
 from pythonium.engine.packets.base import Packet
 from pythonium.engine.router.struct import HandlerStruct
 from pythonium.engine.typealiases import Handler
+
+logger = logging.getLogger(__name__)
 
 
 class Router:
@@ -63,9 +66,7 @@ class Router:
                 f"Router not {type(router).__name__!r}"
             )
             raise TypeError(msg)
-        if self._parent_router:
-            msg = f"Router is already attached to {self._parent_router!r}"
-            raise RuntimeError(msg)
+
         if self == router:
             msg = "Self-referencing routers is not allowed"
             raise RuntimeError(msg)
@@ -111,6 +112,18 @@ class Router:
             self._baked_handlers[(packet.state, packet.packet_id)] = (
                 handler_struct
             )
+        logger.info(
+            "Baking complete: %s handlers registered",
+            len(self._baked_handlers),
+        )
+
+        pretty_printed_handlers = []  # packet name -> handler name
+        for (state, packet_id), handler_struct in self._baked_handlers.items():
+            handler_name = handler_struct.func.__name__
+            pretty_printed_handlers.append(
+                f"{state}, {packet_id:#04x} -> {handler_name}"
+            )
+        logger.debug("Baked handlers: %s", pretty_printed_handlers)
 
     async def route(self, packet: Packet, **kwargs: object) -> None:
         """Route command to appropriate handler."""

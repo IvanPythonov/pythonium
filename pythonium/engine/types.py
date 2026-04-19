@@ -71,6 +71,7 @@ from pythonium.engine.codecs.game_codecs import (
     ModifierDataCodec,
     ModifierDataStruct,
 )
+from pythonium.engine.codecs.identifier import IdentifierCodec
 from pythonium.engine.codecs.map_data import (
     MapColorPatchCodec,
     MapColorPatchStruct,
@@ -81,6 +82,7 @@ from pythonium.engine.codecs.minecart import (
     MinecartStepCodec,
     MinecartStepStruct,
 )
+from pythonium.engine.codecs.node import NodeCodec, NodeStruct
 from pythonium.engine.codecs.optional import OptionalCodec
 from pythonium.engine.codecs.particle import (
     BlockParticleAlternativeCodec,
@@ -190,9 +192,7 @@ type OptionalDouble = Annotated[float | None, OptionalCodec(DoubleCodec())]
 
 type NBTCompound = Annotated[dict[str, BaseTag], NBTCodec()]
 
-type Identifier = Annotated[
-    str, StringCodec()
-]  # TODO(IvanPythonov): Create IdentifierCodec WITH VALIDATION
+type Identifier = Annotated[str, IdentifierCodec()]
 type IdentifierArray = Annotated[list[str], ArrayCodec(StringCodec())]
 
 type TextComponent = Annotated[NBTCompound, TextComponentCodec()]
@@ -346,3 +346,5 @@ type TagArray = Annotated[
 ]
 
 type HeightmapData = Annotated[dict[str, list[int]], HeightmapsCodec()]
+
+type NodeArray = Annotated[list[NodeStruct], ArrayCodec(NodeCodec())]

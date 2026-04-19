@@ -4,16 +4,22 @@ import importlib
 import pkgutil
 from pathlib import Path
 
-from .base import router
+from .base import router as play_router
 
-current_dir = Path(__file__).resolve().parent
 
-for _, module_name, __ in pkgutil.iter_modules([str(current_dir)]):
-    if module_name in ("base", "__init__"):
-        continue
+def play_router_bake() -> None:
+    current_dir = Path(__file__).resolve().parent
 
-    full_module_name = f"{__name__}.{module_name}"
+    for _, module_name, __ in pkgutil.iter_modules([str(current_dir)]):
+        if module_name in ("base", "__init__"):
+            continue
 
-    importlib.import_module(full_module_name)
+        full_module_name = f"{__name__}.{module_name}"
 
-__all__ = ("router",)
+        router = importlib.import_module(full_module_name).router
+
+        play_router.include_router(router)
+
+
+play_router_bake()
+__all__ = ("play_router",)

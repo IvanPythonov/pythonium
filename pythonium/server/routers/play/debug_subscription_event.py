@@ -3,10 +3,12 @@
 from pythonium.engine.packets.ingoing import (
     DebugSampleSubscription,
 )
-from pythonium.server.routers.play import router as play_router
+from pythonium.engine.router import Router
+
+router = Router(name=__name__)
 
 
-@play_router.on(DebugSampleSubscription)
+@router.on(DebugSampleSubscription)
 async def on_debug_event(
     debug_event: DebugSampleSubscription,
 ) -> None:

@@ -7,7 +7,6 @@ from .configuration import (
     CustomReportDetails,
     FeatureFlags,
     FinishConfiguration,
-    KeepAlive,
     Ping,
     RegistryData,
     RemoveResourcePack,
@@ -21,6 +20,9 @@ from .configuration import (
 )
 from .configuration import (
     Disconnect as ConfigurationDisconnect,
+)
+from .configuration import (
+    KeepAlive as ConfigurationKeepAlive,
 )
 from .login import (
     Compress,
@@ -234,6 +236,7 @@ __all__ = (
     "Collect",
     "Compress",
     "ConfigurationDisconnect",
+    "ConfigurationKeepAlive",
     "CookieRequest",
     "CookieRequest",
     "CookieRequest",
@@ -301,6 +304,7 @@ __all__ = (
     "PlayCustomPayload",
     "PlayCustomReportDetails",
     "PlayDisconnect",
+    "PlayKeepAlive",
     "PlayKeepAlive",
     "PlayPing",
     "PlayRemoveResourcePack",

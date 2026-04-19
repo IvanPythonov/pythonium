@@ -1,5 +1,11 @@
 from typing import ClassVar
 
+from pythonium.engine.enums.action_id import ActionId
+from pythonium.engine.enums.block_action import BlockActionStatus, Rotation
+from pythonium.engine.enums.difficulty import DifficultyEnum
+from pythonium.engine.enums.gamemode import GameMode
+from pythonium.engine.enums.placement import PlacementFlags
+from pythonium.engine.enums.use_entity import Hand, UseEntityAction
 from pythonium.engine.packets.base import Packet
 from pythonium.engine.types import (
     UUID,
@@ -65,8 +71,7 @@ class SetDifficulty(Packet, kw_only=True):
 
     __packet_name__: ClassVar[str] = "play:serverbound:set_difficulty"
 
-    new_difficulty: UByte  # 0: peaceful, 1: easy, 2: normal, 3: hard.
-    # TODO(IvanPythonov): DIFFICULTY ENUM1!!
+    new_difficulty: DifficultyEnum
 
 
 class ChangeGamemode(Packet, kw_only=True):
@@ -74,9 +79,7 @@ class ChangeGamemode(Packet, kw_only=True):
 
     __packet_name__: ClassVar[str] = "play:serverbound:change_gamemode"
 
-    mode: VarInt  # VarInt Enum 	0: survival, 1: creative, 2: adventure,
-    # 3: spectator.
-    # TODO(IvanPythonov): gamemoooooooode enum
+    mode: GameMode
 
 
 class MessageAcknowledgement(Packet, kw_only=True):
@@ -275,14 +278,15 @@ class UseEntity(Packet, kw_only=True):
     __packet_name__: ClassVar[str] = "play:serverbound:use_entity"
 
     target: VarInt
-    mouse: VarInt  # 0: interact, 1: attack, 2: interact at.
+    mouse: UseEntityAction
+
     x: OptionalFloat
     y: OptionalFloat
     z: OptionalFloat
-    hand: VarInt  #  0: main hand, 1: off hand.
-    sneaking: Boolean
 
-    # TODO(IvanPythonov): ENUMS
+    hand: Hand
+
+    sneaking: Boolean
 
 
 class GenerateStructure(Packet, kw_only=True):
@@ -436,17 +440,7 @@ class EntityAction(Packet, kw_only=True):
     __packet_name__: ClassVar[str] = "play:serverbound:entity_action"
 
     entity_id: VarInt
-    action_id: VarInt  # Action ID can be one of the following values:
-    # ID 	Action
-    # 0 	Leave bed
-    # 1 	Start sprinting
-    # 2 	Stop sprinting
-    # 3 	Start jump with horse
-    # 4 	Stop jump with horse
-    # 5 	Open vehicle inventory
-    # 6 	Start flying with elytra
-
-    # TODO(IvanPythonov): MAKE ENUMS
+    action_id: ActionId
 
     jump_boost: VarInt
 
@@ -612,11 +606,7 @@ class UpdateStructureBlock(Packet, kw_only=True):
     metadata: String
     integrity: Float
     seed: VarLong
-    flags: Byte
-    # 0x01: Ignore entities; 0x02: Show air;
-    # 0x04: Show bounding box; 0x08: Strict placement.
-
-    # TODO(IvanPythonov): ENUMS
+    flags: PlacementFlags
 
 
 class SetTestBlock(Packet, kw_only=True):
@@ -676,14 +666,11 @@ class TestInstanceBlockAction(Packet, kw_only=True):
     size_y: VarInt
     size_z: VarInt
 
-    rotation: VarInt  # 0: none, 1: clockwise 90°, 2: clockwise 180°,
-    # 3: counter-clockwise 90°.
+    rotation: Rotation
     ignore_entities: Boolean
-    status: VarInt  # 0: cleared, 1: running, 2: finished.
+    status: BlockActionStatus
 
     error_message: PrefixedOptionalTextComponent
-
-    # TODO(IvanPythonov): e nu ms
 
 
 class BlockPlace(Packet, kw_only=True):

@@ -1,9 +1,11 @@
 """Teleport Confirm Router."""
 
 from pythonium.engine.packets.ingoing.play import TeleportConfirm
-from pythonium.server.routers.play import router as play_router
+from pythonium.engine.router import Router
+
+router = Router(name=__name__)
 
 
-@play_router.on(TeleportConfirm)
+@router.on(TeleportConfirm)
 async def teleport_confirm_handler(teleport_confirm: TeleportConfirm) -> None:
     pass

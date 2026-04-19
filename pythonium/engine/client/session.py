@@ -1,13 +1,16 @@
+import asyncio
 from typing import final
 
 from msgspec import Struct
 
-from pythonium.engine.enums import State
+from pythonium.engine.enums.states import State
 
 
 @final
 class ClientSession(Struct):
     """Class representing Minecraft client session."""
+
+    background_tasks: set[asyncio.Task] = set()
 
     state: State = State.HANDSHAKING
 
@@ -29,3 +32,9 @@ class ClientSession(Struct):
 
     displayed_skin_parts: int | None = None
     main_hand: int | None = None
+
+    visible_chunks: set[tuple[int, int]] = set()
+    last_chunk_center: tuple[int, int] | None = None
+
+    chunk_send_lock = asyncio.Lock()
+    chunk_ack_future: asyncio.Future | None = None

@@ -1,5 +1,6 @@
 import contextlib
 import json
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -22,7 +23,7 @@ class BlockRegistry:
             data = json.load(f)
 
         for block in data:
-            name = f"minecraft:{block['name']}"
+            name = sys.intern(f"minecraft:{block['name']}")
             min_id = block["minStateId"]
             states = block.get("states", [])
 
@@ -66,4 +67,5 @@ class BlockRegistry:
         return min_id + offset
 
 
+# цель: плоский словарь {"minecraft:dirt[snowy=false]": 10}
 BLOCK_REGISTRY = BlockRegistry()

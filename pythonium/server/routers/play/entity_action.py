@@ -3,10 +3,12 @@
 from pythonium.engine.packets.ingoing import (
     EntityAction,
 )
-from pythonium.server.routers.play import router as play_router
+from pythonium.engine.router import Router
+
+router = Router(name=__name__)
 
 
-@play_router.on(EntityAction)
+@router.on(EntityAction)
 async def on_entity_action(
     entity_action: EntityAction,
 ) -> None:

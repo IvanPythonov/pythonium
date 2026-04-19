@@ -3,11 +3,15 @@
 from pythonium.engine.packets.ingoing import (
     BlockDig,
 )
-from pythonium.server.routers.play import router as play_router
+from pythonium.engine.router import Router
+from pythonium.engine.world import World
+
+router = Router(name=__name__)
 
 
-@play_router.on(BlockDig)
-async def on_block_dig(
-    block_dig: BlockDig,
-) -> None:
-    pass
+@router.on(BlockDig)
+async def on_block_dig(block_dig: BlockDig, world: World) -> None:
+    if block_dig.status == 2:
+        await world.remove_block(*block_dig.location)
+    
+    

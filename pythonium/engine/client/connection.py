@@ -1,4 +1,4 @@
-from asyncio import StreamReader, StreamWriter, wait_for
+from asyncio import StreamReader, StreamWriter
 from typing import final
 
 from pythonium.engine.constants import MAX_PACKET_LENGTH
@@ -24,7 +24,6 @@ class ClientConnection:
 
         try:
             self.writer.write(data)
-            await wait_for(self.writer.drain(), timeout=15.0)
         except (ConnectionResetError, BrokenPipeError, RuntimeError) as e:
             raise WriterError(error=e.__class__.__name__) from e
 
@@ -35,3 +34,7 @@ class ClientConnection:
         """Disconnect the client from the server."""
         self.writer.close()
         await self.writer.wait_closed()
+
+    @property
+    def is_connected(self) -> bool:
+        return not self.writer.is_closing()

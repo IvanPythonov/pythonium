@@ -15,7 +15,6 @@ class ChatTypeDecorationStruct(Struct):
     parameters: list[
         int
     ]  # Array of VarInt Enum (0: sender, 1: target, 2: content)
-    # TODO(IvanPythonov): enums
     style: dict  # NBT Compound
 
 

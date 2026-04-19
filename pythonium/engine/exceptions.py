@@ -4,9 +4,8 @@ from typing import Any, override
 class Error(Exception):
     """Base exception class for all pythonium errors."""
 
+    message: str = "Unknown error"
     show_in_production: bool = False
-
-    message: str
 
     @override
     def __init__(self, **context_kwargs: Any) -> None:
@@ -42,6 +41,12 @@ class WriterError(Error):
 
 class VarIntDecodeError(DecodeError):
     """Exception raised when a varint decode error occurs."""
+
+    message = "Malformed VarInt detected."
+
+
+class VarIntEncodeError(EncodeError):
+    """Exception raised when a varint encode error occurs."""
 
     message = "Malformed VarInt detected."
 
@@ -86,3 +91,9 @@ class SuspiciousClientError(Error):
     message = "Client has no UUID or username after configuration phase."
 
     show_in_production = True
+
+
+class IncorrectIdentifierError(Error):
+    """Exception raised when a identifier is incorrect."""
+
+    message = "Invalid identifier."

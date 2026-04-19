@@ -10,7 +10,7 @@ host = "0.0.0.0"
 # default port. where we dropping?
 port = 25565
 # debug mode. you shouldnt change this
-debug = true
+debug = false
 
 [auth]
 # true = premium chads only (Mojang auth required)
@@ -31,7 +31,7 @@ hardcore = false
 
 [performance]
 # how many chunks render around a player. 10 is chill, 32 will make your cpu exit the chat
-view-distance = 10
+view-distance = 8
 # the distance where mobs actually have brain cells. outside this, they stand still like npcs
 simulation-distance = 8
 # target ticks per second. if this drops below 20, the server is fighting for its life

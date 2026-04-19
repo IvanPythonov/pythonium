@@ -1,4 +1,3 @@
-import struct
 from typing import Final
 from uuid import UUID
 
@@ -11,6 +10,7 @@ from pythonium.engine.exceptions import (
     DecodeError,
     EncodeError,
     VarIntDecodeError,
+    VarIntEncodeError,
 )
 from pythonium.engine.typealiases import Deserialized
 
@@ -59,38 +59,58 @@ class VarIntCodec(Codec[int]):
     __max_bytes__ = 5
 
     def serialize(self, *, field: int) -> bytes:
-        out = b""
+        if not (-(2**31) <= field < 2**31):
+            raise VarIntEncodeError(value=field, out_of_bounds=True)
+
+        value = field & 0xFFFFFFFF
+        out = bytearray()
         bytes_encountered = 0
 
         while True:
-            byte = field & SEGMENT_BITS
-            field >>= 7
-            out += struct.pack("B", byte | (CONTINUE_BIT if field > 0 else 0))
-            if field == 0:
-                break
+            temp = value & 0x7F
+            value >>= 7
+
+            if value != 0:
+                temp |= 0x80
+
+            out.append(temp)
             bytes_encountered += 1
+
             if bytes_encountered > self.__max_bytes__:
-                raise VarIntDecodeError(
+                raise VarIntEncodeError(
                     bytes_encountered=bytes_encountered,
                     max_bytes=self.__max_bytes__,
                 )
-        return out
+
+            if value == 0:
+                break
+
+        return bytes(out)
 
     def deserialize(self, data: bytes) -> Deserialized[int]:
         number = 0
         bytes_encountered = 0
 
         for byte in data:
-            number |= (byte & SEGMENT_BITS) << 7 * bytes_encountered
+            number |= (byte & 0x7F) << (7 * bytes_encountered)
             bytes_encountered += 1
-            if not byte & CONTINUE_BIT:
-                break
 
             if bytes_encountered > self.__max_bytes__:
                 raise VarIntDecodeError(
                     bytes_encountered=bytes_encountered,
                     max_bytes=self.__max_bytes__,
                 )
+
+            if not (byte & 0x80):
+                break
+        else:
+            raise VarIntDecodeError(
+                bytes_encountered=bytes_encountered,
+                max_bytes=self.__max_bytes__,
+            )
+        if number & (1 << 31):
+            number -= 1 << 32
+
         return number, bytes_encountered
 
 
@@ -138,8 +158,14 @@ class PositionCodec(Codec[tuple[int, int, int]]):
         value, consumed = LongCodec().deserialize(data)
 
         x = value >> 38
-        y = value << 52 >> 52
-        z = value << 26 >> 38
+        z = (value >> 12) & 0x3FFFFFF
+        y = value & 0xFFF
+
+        if y >= 1 << 11:
+            y -= 4096
+        if x >= 1 << 25:
+            x -= 67108864
+
         return (x, y, z), consumed
 
 

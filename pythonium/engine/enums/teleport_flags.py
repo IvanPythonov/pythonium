@@ -14,6 +14,9 @@ class TeleportFlags(IntEnum):
 
     __codec__ = IntCodec()
 
+
+    absolute = 0x0000
+    """Absolute teleportation (no bits set)"""
     relative_x = 0x0001
     """Relative X"""
     relative_y = 0x0002

@@ -1,9 +1,11 @@
 """Custom Payload Router."""
 
 from pythonium.engine.packets.ingoing.play import CustomPayload
-from pythonium.server.routers.play import router as play_router
+from pythonium.engine.router import Router
+
+router = Router(name=__name__)
 
 
-@play_router.on(CustomPayload)
+@router.on(CustomPayload)
 async def custom_payload_handler(custom_payload: CustomPayload) -> None:
     pass

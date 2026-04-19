@@ -55,6 +55,7 @@ class Packet(Struct, kw_only=True):
         cls.state = state
         cls.direction = direction
         cls.packet_id = packet_id
+        cls._cached_bytes = None
 
         PacketStorage.add(packet=cls)
 
@@ -79,7 +80,7 @@ def _build_schema(cls: type[Packet]) -> list[Field]:
     schema: list[Field] = []
 
     for field in class_fields(cls):
-        if field.name.startswith("__"):
+        if field.name.startswith("__") or field.name == "cached_bytes":
             continue
 
         codec = _resolve_field_codec(field.type)
@@ -153,6 +154,12 @@ def deserialize[P: Packet](cls: type[P], data: bytes) -> P:
 
     packet = convert(kwargs, type=cls)
 
-    if logger.isEnabledFor(logging.DEBUG):
+    if logger.isEnabledFor(logging.DEBUG) and cls.__name__ not in (
+        "TickEnd",
+        "Position",
+        "Look",
+        "Flying",
+        "PositionLook",
+    ):
         logger.debug(packet)
     return packet

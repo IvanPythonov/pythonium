@@ -1,9 +1,11 @@
+import struct
+
 from msgspec import Struct
 
 from pythonium.engine.codecs.array import ArrayCodec
 from pythonium.engine.codecs.base import Codec
 from pythonium.engine.codecs.bitset import BitSetCodec
-from pythonium.engine.codecs.custom import VarIntCodec
+from pythonium.engine.codecs.custom import PrefixedByteArrayCodec, VarIntCodec
 from pythonium.engine.codecs.nbt import NBTCodec
 from pythonium.engine.codecs.primitives import (
     ByteCodec,
@@ -36,7 +38,9 @@ class HeightmapsCodec(Codec[dict[str, list[int]]]):
 
         for key, longs in field.items():
             out.extend(self.varint.serialize(field=self._HEIGHTMAP_TYPES[key]))
-            out.extend(self.long_array.serialize(field=longs))
+
+            out.extend(self.varint.serialize(field=len(longs)))
+            out.extend(struct.pack(f">{len(longs)}Q", *longs))
 
         return bytes(out)
 
@@ -136,8 +140,8 @@ class LightDataStruct(Struct):
     block_y_mask: list[int]
     empty_sky_y_mask: list[int]
     empty_block_y_mask: list[int]
-    sky_updates: list[list[int]]
-    block_updates: list[list[int]]
+    sky_updates: list[bytes]
+    block_updates: list[bytes]
 
 
 class LightDataCodec(Codec[LightDataStruct]):
@@ -147,7 +151,7 @@ class LightDataCodec(Codec[LightDataStruct]):
         self.bitset = BitSetCodec()
 
         self.byte_array_array: ArrayCodec = ArrayCodec(
-            ArrayCodec(UnsignedByteCodec())
+            PrefixedByteArrayCodec()
         )
 
     def serialize(self, *, field: LightDataStruct) -> bytes:
