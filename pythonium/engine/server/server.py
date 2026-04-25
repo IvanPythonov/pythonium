@@ -12,7 +12,7 @@ from logging import getLogger
 from pythonium.engine import Client, Router
 from pythonium.engine.client import ClientConnection, ClientSession
 from pythonium.engine.enums import State
-from pythonium.engine.packets.base import Packet
+from pythonium.engine.packets.base import Packet, bake_all_packets
 from pythonium.engine.properties_reader import Properties, get_properties
 from pythonium.engine.server import PacketReader
 from pythonium.engine.tasks.keepalive import send_keepalive
@@ -144,6 +144,8 @@ class Server:
             properties=self.properties,
             world=self.world,
         )
+
+        bake_all_packets()
 
         ticker = self.ticker.run()
         server = start_server(

@@ -1,7 +1,8 @@
 import logging
 import types
+from collections.abc import Callable
 from enum import Enum
-from typing import Any, ClassVar, TypeAliasType, get_args
+from typing import Any, ClassVar, Self, TypeAliasType, get_args
 
 from msgspec import Struct, convert
 from msgspec.json import decode, encode
@@ -17,6 +18,7 @@ from pythonium.engine.codecs import (
 from pythonium.engine.enums import Direction, State
 from pythonium.engine.field import Field
 from pythonium.engine.formatter import format_packet
+from pythonium.engine.packets.factory import SerializeFactory
 from pythonium.engine.packets.packet_storage import PacketStorage
 from pythonium.engine.types import VarInt
 from pythonium.registries.protocol_storage import get_data_by_packet_name
@@ -28,6 +30,11 @@ _UNION_TYPE_ARGS_COUNT = 2
 logger = logging.getLogger(name=__name__)
 
 
+def bake_all_packets() -> None:
+    for packet in Packet.__subclasses__():
+        packet.serialize = SerializeFactory.get(fields=packet.get_schema())
+
+
 class Packet(Struct, kw_only=True):
     """Base packet."""
 
@@ -35,6 +42,9 @@ class Packet(Struct, kw_only=True):
 
     __schema_as_json__: ClassVar[bool] = False
     __schema_cache__: ClassVar[list[Field] | None] = None
+
+    serialize: ClassVar[Callable[[Self], bytes]]
+    deserialize: ClassVar[Callable[[bytes], Self]]
 
     state: ClassVar[State]
     direction: ClassVar[Direction]
@@ -55,7 +65,6 @@ class Packet(Struct, kw_only=True):
         cls.state = state
         cls.direction = direction
         cls.packet_id = packet_id
-        cls._cached_bytes = None
 
         PacketStorage.add(packet=cls)
 
@@ -80,7 +89,10 @@ def _build_schema(cls: type[Packet]) -> list[Field]:
     schema: list[Field] = []
 
     for field in class_fields(cls):
-        if field.name.startswith("__") or field.name == "cached_bytes":
+        if field.name.startswith("__") or field.name in (
+            "serialize",
+            "deserialize",
+        ):
             continue
 
         codec = _resolve_field_codec(field.type)
@@ -118,18 +130,16 @@ def serialize(packet: Packet) -> bytes:
     if logger.isEnabledFor(logging.DEBUG):
         logger.debug(packet)
 
-    packet_id_bytes = _VARINT_CODEC.serialize(field=packet.packet_id)
-    chunks = [packet_id_bytes]
+    chunks = []
 
     if packet.__schema_as_json__:
         json_bytes = encode(packet)
 
+        chunks.append(_VARINT_CODEC.serialize(field=packet.packet_id))
         chunks.append(_VARINT_CODEC.serialize(field=len(json_bytes)))
         chunks.append(json_bytes)
     else:
-        for field in packet.get_schema():
-            value = getattr(packet, field.name)
-            chunks.append(field.codec.serialize(field=value))
+        chunks.append(packet.serialize())
 
     payload = b"".join(chunks)
     length_bytes = _VARINT_CODEC.serialize(field=len(payload))
@@ -137,7 +147,7 @@ def serialize(packet: Packet) -> bytes:
     return length_bytes + payload
 
 
-def deserialize[P: Packet](cls: type[P], data: bytes) -> P:
+def deserialize(cls: type[Packet], data: bytes) -> Packet:
     """Deserialize bytes to packet."""
     offset = 0
     kwargs: dict[str, Any] = {}

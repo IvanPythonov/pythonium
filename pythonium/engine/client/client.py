@@ -12,6 +12,8 @@ from pythonium.engine.packets.outgoing import (
     LoginDisconnect,
     PlayDisconnect,
 )
+from pythonium.engine.packets.outgoing.play import MultiBlockChange
+from pythonium.worldgen.terrain.base import Chunk
 
 _KICK_FACTORIES: dict[
     State,

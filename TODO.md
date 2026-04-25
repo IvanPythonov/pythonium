@@ -1,11 +1,21 @@
 # TODO
 
-- worldgen (SUCCESS)
-- serialization (w.i.p)
-  - zerocopy (AFTER FACTORY)
-  - serialization factory
-- keepalive tasks (SUCCESS)
 - some architecture refactor
-- REPOSITORIES (FIRST)
-- STORAGES
+  - zerocopy serialization and serialization factory
+  - routers dont send any packets (services implement)
+- repositories n services
+- storages implement
 - LIGTNING ENGINE (SUCKS)
+- chunk sender rework (papermc like)
+  - Movement -> ChunkMap -> ChunkHolder
+  - ChunkHolder (EMPTY → LOADING → GENERATED → FULL → SENT) just a struct
+  - ChunkTaskScheduler (worker threads, closer to the player = earlier)
+  - max ~20–40 chunks per tick
+- entities
+  - entity metadata (fuck)
+- rate limiting (clientbound)
+- router.task or cool task manager
+- implement cache
+- hide players count parameter (dont send players count key)
+- profile class in client session
+- update chunk method

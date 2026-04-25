@@ -1,5 +1,6 @@
 import struct
 from array import array
+from collections.abc import Collection
 from typing import Protocol
 
 from pythonium.engine.codecs import VarIntCodec
@@ -69,7 +70,9 @@ class ChunkSection:
     def get_non_air_count(self) -> int:
         return self._non_air_count
 
-    def serialize_data_array(self, bpe: int, entries: list[int]) -> bytes:
+    def serialize_data_array(
+        self, bpe: int, entries: Collection[int]
+    ) -> bytes:
         if bpe == 0:
             return b""
 
@@ -112,7 +115,7 @@ class ChunkSection:
             data = self.serialize_data_array(bpe, indices)
             res.extend(data)
         else:
-            data = self.serialize_data_array(bpe, list(self.__blocks))
+            data = self.serialize_data_array(bpe, self.__blocks)
             res.extend(data)
 
         return bytes(res)

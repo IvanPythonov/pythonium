@@ -97,3 +97,9 @@ class IncorrectIdentifierError(Error):
     """Exception raised when a identifier is incorrect."""
 
     message = "Invalid identifier."
+
+
+class ImpossibleError(Error):
+    """Exception not raised."""
+
+    message = "A stub for typecheckers like Mypy, but the code actually works."

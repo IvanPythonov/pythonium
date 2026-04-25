@@ -1,7 +1,7 @@
 from typing import ClassVar
 
 from pythonium.engine.packets.base import Packet
-from pythonium.engine.types import UUID, RestBuffer, String, VarInt
+from pythonium.engine.types import UUID, ByteArray, RestBuffer, String, VarInt
 
 
 class LoginStart(Packet, kw_only=True):
@@ -18,8 +18,8 @@ class EncryptionBegin(Packet, kw_only=True):
 
     __packet_name__: ClassVar[str] = "login:serverbound:encryption_begin"
 
-    shared_secret: bytes
-    verify_token: bytes
+    shared_secret: ByteArray
+    verify_token: ByteArray
 
 
 class LoginPluginResponse(Packet, kw_only=True):

@@ -1,3 +1,4 @@
+import struct
 from typing import Final
 from uuid import UUID
 
@@ -16,6 +17,8 @@ from pythonium.engine.typealiases import Deserialized
 
 SEGMENT_BITS: Final[int] = 0x7F
 CONTINUE_BIT: Final[int] = 0x80
+
+VARINT_MASK: Final[int] = 0x4000
 
 MAX_STRING_LENGTH: Final[int] = 65535
 
@@ -61,30 +64,26 @@ class VarIntCodec(Codec[int]):
     def serialize(self, *, field: int) -> bytes:
         if not (-(2**31) <= field < 2**31):
             raise VarIntEncodeError(value=field, out_of_bounds=True)
+        val = field & 0xFFFFFFFF
 
-        value = field & 0xFFFFFFFF
+        if val < CONTINUE_BIT:
+            return struct.pack("B", val)
+        if val < VARINT_MASK:
+            return struct.pack(
+                "H",
+                (val & SEGMENT_BITS | CONTINUE_BIT) | ((val & 0x3F80) << 1),
+            )
+
         out = bytearray()
-        bytes_encountered = 0
-
         while True:
-            temp = value & 0x7F
-            value >>= 7
-
-            if value != 0:
-                temp |= 0x80
-
-            out.append(temp)
-            bytes_encountered += 1
-
-            if bytes_encountered > self.__max_bytes__:
-                raise VarIntEncodeError(
-                    bytes_encountered=bytes_encountered,
-                    max_bytes=self.__max_bytes__,
-                )
-
-            if value == 0:
+            byte = val & SEGMENT_BITS
+            val >>= 7
+            if val != 0:
+                byte |= CONTINUE_BIT
+                out.append(byte)
+            else:
+                out.append(byte)
                 break
-
         return bytes(out)
 
     def deserialize(self, data: bytes) -> Deserialized[int]:
@@ -92,7 +91,7 @@ class VarIntCodec(Codec[int]):
         bytes_encountered = 0
 
         for byte in data:
-            number |= (byte & 0x7F) << (7 * bytes_encountered)
+            number |= (byte & SEGMENT_BITS) << (7 * bytes_encountered)
             bytes_encountered += 1
 
             if bytes_encountered > self.__max_bytes__:
@@ -101,7 +100,7 @@ class VarIntCodec(Codec[int]):
                     max_bytes=self.__max_bytes__,
                 )
 
-            if not (byte & 0x80):
+            if not (byte & CONTINUE_BIT):
                 break
         else:
             raise VarIntDecodeError(
