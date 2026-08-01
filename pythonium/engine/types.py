@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Any
 
 from nbtlib import Base as BaseTag
 
@@ -63,6 +63,7 @@ from pythonium.engine.codecs.custom import (
     PrefixedLongByteArrayCodec,
     TextComponentCodec,
 )
+from pythonium.engine.codecs.entity_metadata import EntityMetadataCodec
 from pythonium.engine.codecs.equipment import (
     EquipmentArrayCodec,
     EquipmentEntryStruct,
@@ -94,6 +95,7 @@ from pythonium.engine.codecs.player_info import (
     PlayerInfoUpdateCodec,
     PlayerInfoUpdateStruct,
 )
+from pythonium.engine.codecs.primitives import UnsignedLongCodec
 from pythonium.engine.codecs.recipe import (
     RecipeCodec,
     RecipeDisplayCodec,
@@ -148,6 +150,7 @@ type UShort = Annotated[int, UnsignedShortCodec()]
 
 type Int = Annotated[int, IntCodec()]
 type Long = Annotated[int, LongCodec()]
+type UnsignedLong = Annotated[int, UnsignedLongCodec()]
 
 type Float = Annotated[float, FloatCodec()]
 type Double = Annotated[float, DoubleCodec()]
@@ -348,3 +351,7 @@ type TagArray = Annotated[
 type HeightmapData = Annotated[dict[str, list[int]], HeightmapsCodec()]
 
 type NodeArray = Annotated[list[NodeStruct], ArrayCodec(NodeCodec())]
+
+type EntityMetadataType = Annotated[
+    dict[int, tuple[int, Any]], EntityMetadataCodec()
+]

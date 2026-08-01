@@ -3,12 +3,12 @@ name = "pythonium"
 version = "0.1.0"
 description = "Minecraft server on python"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.14"
 dependencies = [
     "msgspec>=0.20.0",
     "nbtlib>=2.0.4",
-    "snakeviz>=2.2.2",
-    "uvloop ; sys_platform == 'linux'",
+    "uvloop ; sys_platform != 'win32'",
+    "winloop>=0.6.2 ; sys_platform == 'win32'",
 ]
 
 [dependency-groups]
@@ -16,12 +16,13 @@ dev = [
     "ruff>=0.14.9",
     "ty>=0.0.1a35",
     "mypy>=1.19.1",
+    "snakeviz>=2.2.2",
 ]
 
 [tool.ruff]
 line-length = 79
 indent-width = 4
-target-version = "py313"
+target-version = "py314"
 
 [tool.ruff.lint]
 ignore = [

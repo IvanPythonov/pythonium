@@ -1,157 +1,95 @@
 import asyncio
-import os
-import socket
-from asyncio import (
-    StreamReader,
-    StreamWriter,
-    gather,
-    start_server,
-)
-from logging import getLogger
 
-from pythonium.engine import Client, Router
-from pythonium.engine.client import ClientConnection, ClientSession
-from pythonium.engine.enums import State
-from pythonium.engine.packets.base import Packet, bake_all_packets
-from pythonium.engine.properties_reader import Properties, get_properties
-from pythonium.engine.server import PacketReader
-from pythonium.engine.tasks.keepalive import send_keepalive
-from pythonium.engine.ticker.ticker import Ticker
+from pythonium.engine import Router
+from pythonium.engine.entity.tracker import EntityTracker
+from pythonium.engine.properties_reader import get_properties
+from pythonium.engine.server.client_manager import ClientManager
+from pythonium.engine.server.di import Container
+from pythonium.engine.server.handler import NetworkHandler
+from pythonium.engine.server.network import Network
+from pythonium.engine.server.packet_dispatcher import PacketDispatcher
+from pythonium.engine.services.player_world_view import WorldViewService
+from pythonium.engine.ticker import Ticker
 from pythonium.engine.world import World
+from pythonium.worldgen.chunk_sender import ChunkSender
+from pythonium.worldgen.terrain.flat import FlatWorldGenerator
+from pythonium.worldgen.terrain.noise import NoiseWorldGenerator
 
-logger = getLogger(__name__)
-
-
-def exception_task_handler(task: asyncio.Task) -> None:
-    task.result()
-
-
-async def safe_route(
-    router: Router,
-    packet: Packet,
-    client: Client,
-    properties: Properties,
-) -> None:
-    try:
-        await router.route(packet=packet, client=client)
-    except Exception as e:
-        error = "Internal Server Error."
-        if properties.server.debug or getattr(e, "show_in_production", False):
-            error += f"\n\u00a7c Details: {e!r}"
-        await client.kick(error)
-        raise
+CHUNK_GENERATORS = {
+    "noise": NoiseWorldGenerator(),
+    "flat": FlatWorldGenerator(),
+}
 
 
 class Server:
-    """Class representing Minecraft server."""
+    """Server."""
 
     def __init__(self, **kwargs: object) -> None:
-        self._clients: set[Client] = set()
-
         self.properties = get_properties(path="properties.toml")
+        self.router = Router(name=__name__)
 
-        self.world = World()
-        self.ticker = Ticker(world=self.world)
+        self.background_tasks = set()
 
-        self.router = Router(name=self.__class__.__name__, kwargs=kwargs)
-
-    def add_client(self, client: Client) -> None:
-        """Add a client to the server."""
-        self._clients.add(client)
-
-    def remove_client(self, client: Client) -> None:
-        """Remove a client from the server."""
-        self._clients.discard(client)
-
-    async def broadcast(self, packet: Packet) -> None:
-        await asyncio.gather(
-            *(client.send(packet) for client in self._clients)
+        self.world = World(
+            chunk_generator=CHUNK_GENERATORS[self.properties.world.world_type]
         )
 
-    async def broadcast_many(self, *packets: Packet) -> None:
-        for packet in packets:
-            await self.broadcast(packet=packet)
+        self.client_manager = ClientManager()
 
-    def _configure_socket(self, writer: StreamWriter) -> None:
-        client_socket: socket.socket = writer.get_extra_info("socket")
-        if not client_socket:
-            return
-
-        client_socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-
-        if hasattr(socket, "TCP_QUICKACK"):
-            client_socket.setsockopt(
-                socket.IPPROTO_TCP, socket.TCP_QUICKACK, 1
-            )
-
-        client_socket.setsockopt(
-            socket.SOL_SOCKET, socket.SO_SNDBUF, 128 * 1024
-        )
-        client_socket.setsockopt(
-            socket.SOL_SOCKET, socket.SO_RCVBUF, 128 * 1024
+        self.network = Network(
+            client_manager=self.client_manager,
         )
 
-        client_socket.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
-
-        writer.transport.set_write_buffer_limits(high=64 * 1024)
-
-    async def _handle_connection(
-        self, reader: StreamReader, writer: StreamWriter
-    ) -> None:
-        """Handle a new client connection."""
-        self._configure_socket(writer=writer)
-
-        address: str = writer.get_extra_info("peername")[0]
-        logger.info("New connection from %s", address)
-
-        client = Client(
-            ClientConnection(reader=reader, writer=writer),
-            ClientSession(state=State.HANDSHAKING),
+        self.chunk_sender = ChunkSender(world=self.world)
+        self.world_view_service = WorldViewService(
+            chunk_sender=self.chunk_sender,
+            view_distance=self.properties.performance.view_distance,
         )
 
-        self.add_client(client)
-
-        keepalive_task = asyncio.create_task(
-            send_keepalive(client=client),
-            name=f"KeepAliveTask-{address}",
+        self.entity_tracker = EntityTracker(
+            network=self.network, world=self.world
         )
 
-        packet_reader = PacketReader(reader)
+        self.ticker = Ticker(
+            world=self.world, entity_tracker=self.entity_tracker
+        )
 
-        async for packet in packet_reader.read(client_session=client.session):
-            await safe_route(
-                packet=packet,
-                router=self.router,
-                client=client,
-                properties=self.properties,
-            )
+        self.container = Container(
+            properties=self.properties,
+            client_manager=self.client_manager,
+            world=self.world,
+            entity_tracker=self.entity_tracker,
+            world_view_service=self.world_view_service,
+            server=self,
+            chunk_sender=self.chunk_sender,
+            ticker=self.ticker,
+            extra=kwargs,
+        )
 
-        keepalive_task.cancel()
-        self.remove_client(client)
-        logger.info("Disconnected from %s", address)
-        await client.disconnect()
+        self.packet_dispatcher = PacketDispatcher(
+            router=self.router, container=self.container
+        )
+
+        self.network_handler = NetworkHandler(
+            host=self.properties.server.host,
+            port=self.properties.server.port,
+            client_manager=self.client_manager,
+            properties=self.properties,
+            packet_dispatcher=self.packet_dispatcher,
+        )
 
     async def serve(self) -> None:
-        logger.info(
-            "Serving on %s:%s",
-            self.properties.server.host,
-            self.properties.server.port,
-        )
-        logger.debug("Current PID: %d", os.getpid())
+        self.router.bake()
 
-        self.router.bake(
-            ticker=self.ticker,
-            properties=self.properties,
-            world=self.world,
-        )
+        ticker_task = asyncio.create_task(self.ticker.run(), name="TickerTask")
+        self.background_tasks.add(ticker_task)
+        ticker_task.add_done_callback(self.background_tasks.discard)
 
-        bake_all_packets()
-
-        ticker = self.ticker.run()
-        server = start_server(
-            self._handle_connection,
-            self.properties.server.host,
-            self.properties.server.port,
+        server = await asyncio.start_server(
+            self.network_handler.on_connect,
+            self.network_handler.host,
+            self.network_handler.port,
         )
 
-        await gather(ticker, server)
+        async with server:
+            await server.serve_forever()

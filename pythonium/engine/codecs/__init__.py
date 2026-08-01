@@ -1,5 +1,3 @@
-"""Docstring for pythonium.engine.codecs."""
-
 from .array import ArrayCodec
 from .base import Codec, PrimitiveCodec, resolve_codec
 from .custom import (
@@ -10,6 +8,7 @@ from .custom import (
     VarIntCodec,
     VarLongCodec,
 )
+from .entity_metadata import EntityMetadataCodec
 from .game_codecs import ModifierDataCodec, ModifierDataStruct
 from .nbt import (
     NBTCodec,
@@ -30,11 +29,11 @@ from .slot import SlotCodec
 
 __all__ = (
     "ArrayCodec",
-    "ArrayCodec",
     "BooleanCodec",
     "ByteCodec",
     "Codec",
     "DoubleCodec",
+    "EntityMetadataCodec",
     "FloatCodec",
     "IntCodec",
     "LongCodec",

@@ -2,8 +2,12 @@ import asyncio
 import logging
 import time
 from collections import deque
+from typing import TYPE_CHECKING
 
-from pythonium.engine.world import World
+from pythonium.engine.entity.tracker import EntityTracker
+
+if TYPE_CHECKING:
+    from pythonium.engine.world import World
 
 logger = logging.getLogger(name=__name__)
 
@@ -23,11 +27,12 @@ class Ticker:
     TPS = 20
     TICK_TIME = 1.0 / TPS
 
-    def __init__(self, world: World) -> None:
+    def __init__(self, world: "World", entity_tracker: EntityTracker) -> None:
         self.current_tick = 0
         self.tick_metrics = TickMetrics()
 
         self.world = world
+        self.entity_tracker = entity_tracker
 
         self._samples: deque[float] = deque(maxlen=100)
         self._last_tick_time: float = time.monotonic()
@@ -41,6 +46,7 @@ class Ticker:
             start_logic = time.monotonic()
 
             self.world.tick(current_tick=self.current_tick)
+            await self.entity_tracker.tick()
 
             logic_time = time.monotonic() - start_logic
 

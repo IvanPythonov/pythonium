@@ -26,8 +26,11 @@
 git clone https://github.com/IvanPythonov/pythonium
 cd pythonium
 
-# Start with Docker
+# Start with Docker (faster on Linux)
 docker compose up -d
+
+# Start with UV (faster on Windows)
+uv run -m pythonium
 ```
 
 ---

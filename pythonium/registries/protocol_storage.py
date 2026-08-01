@@ -1,32 +1,34 @@
 import json
 from pathlib import Path
+from typing import Self
 
 from pythonium.engine.enums import Direction, State
+from pythonium.engine.types import VarInt
+from pythonium.registries.base import Registry
 
-PROTOCOL_PATH = Path(__file__).parent / "protocol.json"
-
-
-def load_protocol_registry() -> dict[str, tuple[State, Direction, int]]:
-    with PROTOCOL_PATH.open("r", encoding="utf-8") as f:
-        data = json.load(f)
-
-    registry = {}
-
-    for full_key, info in data.items():
-        direction_str: str = info[0]
-        state_str: str = info[1]
-        packet_id: int = info[2]
-
-        state_enum = State[state_str.upper()]
-        direction_enum = Direction[direction_str.upper()]
-
-        registry[full_key] = (state_enum, direction_enum, packet_id)
-
-    return registry
+type ProtocolInfo = tuple[State, Direction, VarInt]
 
 
-PROTOCOL_REGISTRY = load_protocol_registry()
+class ProtocolRegistry(Registry[ProtocolInfo]):
+    """Protocol registry."""
+
+    __registry_path__ = Path(__file__).parent / "packet_data.json"
+
+    def discover(self) -> Self:
+        with self.__registry_path__.open("r", encoding="utf-8") as file:
+            data = json.load(file)
+
+        for full_key, (direction, state, packet_id) in data.items():
+            self.register(
+                full_key,
+                (
+                    State[state],
+                    Direction[direction],
+                    packet_id,
+                ),
+            )
+
+        return self
 
 
-def get_data_by_packet_name(packet_name: str) -> tuple[State, Direction, int]:
-    return PROTOCOL_REGISTRY[packet_name]
+PROTOCOL_REGISTRY = ProtocolRegistry().discover()

@@ -1,0 +1,1227 @@
+{
+    "handshaking:serverbound:set_protocol": [
+        "SERVERBOUND",
+        "HANDSHAKING",
+        0
+    ],
+    "handshaking:serverbound:legacy_server_list_ping": [
+        "SERVERBOUND",
+        "HANDSHAKING",
+        254
+    ],
+    "status:clientbound:server_info": [
+        "CLIENTBOUND",
+        "STATUS",
+        0
+    ],
+    "status:clientbound:ping": [
+        "CLIENTBOUND",
+        "STATUS",
+        1
+    ],
+    "status:serverbound:ping_start": [
+        "SERVERBOUND",
+        "STATUS",
+        0
+    ],
+    "status:serverbound:ping": [
+        "SERVERBOUND",
+        "STATUS",
+        1
+    ],
+    "login:clientbound:disconnect": [
+        "CLIENTBOUND",
+        "LOGIN",
+        0
+    ],
+    "login:clientbound:encryption_begin": [
+        "CLIENTBOUND",
+        "LOGIN",
+        1
+    ],
+    "login:clientbound:success": [
+        "CLIENTBOUND",
+        "LOGIN",
+        2
+    ],
+    "login:clientbound:compress": [
+        "CLIENTBOUND",
+        "LOGIN",
+        3
+    ],
+    "login:clientbound:login_plugin_request": [
+        "CLIENTBOUND",
+        "LOGIN",
+        4
+    ],
+    "login:clientbound:cookie_request": [
+        "CLIENTBOUND",
+        "LOGIN",
+        5
+    ],
+    "login:serverbound:login_start": [
+        "SERVERBOUND",
+        "LOGIN",
+        0
+    ],
+    "login:serverbound:encryption_begin": [
+        "SERVERBOUND",
+        "LOGIN",
+        1
+    ],
+    "login:serverbound:login_plugin_response": [
+        "SERVERBOUND",
+        "LOGIN",
+        2
+    ],
+    "login:serverbound:login_acknowledged": [
+        "SERVERBOUND",
+        "LOGIN",
+        3
+    ],
+    "login:serverbound:cookie_response": [
+        "SERVERBOUND",
+        "LOGIN",
+        4
+    ],
+    "configuration:clientbound:cookie_request": [
+        "CLIENTBOUND",
+        "CONFIGURATION",
+        0
+    ],
+    "configuration:clientbound:custom_payload": [
+        "CLIENTBOUND",
+        "CONFIGURATION",
+        1
+    ],
+    "configuration:clientbound:disconnect": [
+        "CLIENTBOUND",
+        "CONFIGURATION",
+        2
+    ],
+    "configuration:clientbound:finish_configuration": [
+        "CLIENTBOUND",
+        "CONFIGURATION",
+        3
+    ],
+    "configuration:clientbound:keep_alive": [
+        "CLIENTBOUND",
+        "CONFIGURATION",
+        4
+    ],
+    "configuration:clientbound:ping": [
+        "CLIENTBOUND",
+        "CONFIGURATION",
+        5
+    ],
+    "configuration:clientbound:reset_chat": [
+        "CLIENTBOUND",
+        "CONFIGURATION",
+        6
+    ],
+    "configuration:clientbound:registry_data": [
+        "CLIENTBOUND",
+        "CONFIGURATION",
+        7
+    ],
+    "configuration:clientbound:remove_resource_pack": [
+        "CLIENTBOUND",
+        "CONFIGURATION",
+        8
+    ],
+    "configuration:clientbound:add_resource_pack": [
+        "CLIENTBOUND",
+        "CONFIGURATION",
+        9
+    ],
+    "configuration:clientbound:store_cookie": [
+        "CLIENTBOUND",
+        "CONFIGURATION",
+        10
+    ],
+    "configuration:clientbound:transfer": [
+        "CLIENTBOUND",
+        "CONFIGURATION",
+        11
+    ],
+    "configuration:clientbound:feature_flags": [
+        "CLIENTBOUND",
+        "CONFIGURATION",
+        12
+    ],
+    "configuration:clientbound:tags": [
+        "CLIENTBOUND",
+        "CONFIGURATION",
+        13
+    ],
+    "configuration:clientbound:select_known_packs": [
+        "CLIENTBOUND",
+        "CONFIGURATION",
+        14
+    ],
+    "configuration:clientbound:custom_report_details": [
+        "CLIENTBOUND",
+        "CONFIGURATION",
+        15
+    ],
+    "configuration:clientbound:server_links": [
+        "CLIENTBOUND",
+        "CONFIGURATION",
+        16
+    ],
+    "configuration:clientbound:clear_dialog": [
+        "CLIENTBOUND",
+        "CONFIGURATION",
+        17
+    ],
+    "configuration:clientbound:show_dialog": [
+        "CLIENTBOUND",
+        "CONFIGURATION",
+        18
+    ],
+    "configuration:serverbound:settings": [
+        "SERVERBOUND",
+        "CONFIGURATION",
+        0
+    ],
+    "configuration:serverbound:cookie_response": [
+        "SERVERBOUND",
+        "CONFIGURATION",
+        1
+    ],
+    "configuration:serverbound:custom_payload": [
+        "SERVERBOUND",
+        "CONFIGURATION",
+        2
+    ],
+    "configuration:serverbound:finish_configuration": [
+        "SERVERBOUND",
+        "CONFIGURATION",
+        3
+    ],
+    "configuration:serverbound:keep_alive": [
+        "SERVERBOUND",
+        "CONFIGURATION",
+        4
+    ],
+    "configuration:serverbound:pong": [
+        "SERVERBOUND",
+        "CONFIGURATION",
+        5
+    ],
+    "configuration:serverbound:resource_pack_receive": [
+        "SERVERBOUND",
+        "CONFIGURATION",
+        6
+    ],
+    "configuration:serverbound:select_known_packs": [
+        "SERVERBOUND",
+        "CONFIGURATION",
+        7
+    ],
+    "configuration:serverbound:custom_click_action": [
+        "SERVERBOUND",
+        "CONFIGURATION",
+        8
+    ],
+    "play:clientbound:bundle_delimiter": [
+        "CLIENTBOUND",
+        "PLAY",
+        0
+    ],
+    "play:clientbound:spawn_entity": [
+        "CLIENTBOUND",
+        "PLAY",
+        1
+    ],
+    "play:clientbound:animation": [
+        "CLIENTBOUND",
+        "PLAY",
+        2
+    ],
+    "play:clientbound:statistics": [
+        "CLIENTBOUND",
+        "PLAY",
+        3
+    ],
+    "play:clientbound:acknowledge_player_digging": [
+        "CLIENTBOUND",
+        "PLAY",
+        4
+    ],
+    "play:clientbound:block_break_animation": [
+        "CLIENTBOUND",
+        "PLAY",
+        5
+    ],
+    "play:clientbound:tile_entity_data": [
+        "CLIENTBOUND",
+        "PLAY",
+        6
+    ],
+    "play:clientbound:block_action": [
+        "CLIENTBOUND",
+        "PLAY",
+        7
+    ],
+    "play:clientbound:block_change": [
+        "CLIENTBOUND",
+        "PLAY",
+        8
+    ],
+    "play:clientbound:boss_bar": [
+        "CLIENTBOUND",
+        "PLAY",
+        9
+    ],
+    "play:clientbound:difficulty": [
+        "CLIENTBOUND",
+        "PLAY",
+        10
+    ],
+    "play:clientbound:chunk_batch_finished": [
+        "CLIENTBOUND",
+        "PLAY",
+        11
+    ],
+    "play:clientbound:chunk_batch_start": [
+        "CLIENTBOUND",
+        "PLAY",
+        12
+    ],
+    "play:clientbound:chunk_biomes": [
+        "CLIENTBOUND",
+        "PLAY",
+        13
+    ],
+    "play:clientbound:clear_titles": [
+        "CLIENTBOUND",
+        "PLAY",
+        14
+    ],
+    "play:clientbound:tab_complete": [
+        "CLIENTBOUND",
+        "PLAY",
+        15
+    ],
+    "play:clientbound:declare_commands": [
+        "CLIENTBOUND",
+        "PLAY",
+        16
+    ],
+    "play:clientbound:close_window": [
+        "CLIENTBOUND",
+        "PLAY",
+        17
+    ],
+    "play:clientbound:window_items": [
+        "CLIENTBOUND",
+        "PLAY",
+        18
+    ],
+    "play:clientbound:craft_progress_bar": [
+        "CLIENTBOUND",
+        "PLAY",
+        19
+    ],
+    "play:clientbound:set_slot": [
+        "CLIENTBOUND",
+        "PLAY",
+        20
+    ],
+    "play:clientbound:cookie_request": [
+        "CLIENTBOUND",
+        "PLAY",
+        21
+    ],
+    "play:clientbound:set_cooldown": [
+        "CLIENTBOUND",
+        "PLAY",
+        22
+    ],
+    "play:clientbound:chat_suggestions": [
+        "CLIENTBOUND",
+        "PLAY",
+        23
+    ],
+    "play:clientbound:custom_payload": [
+        "CLIENTBOUND",
+        "PLAY",
+        24
+    ],
+    "play:clientbound:damage_event": [
+        "CLIENTBOUND",
+        "PLAY",
+        25
+    ],
+    "play:clientbound:debug_sample": [
+        "CLIENTBOUND",
+        "PLAY",
+        26
+    ],
+    "play:clientbound:hide_message": [
+        "CLIENTBOUND",
+        "PLAY",
+        27
+    ],
+    "play:clientbound:kick_disconnect": [
+        "CLIENTBOUND",
+        "PLAY",
+        28
+    ],
+    "play:clientbound:profileless_chat": [
+        "CLIENTBOUND",
+        "PLAY",
+        29
+    ],
+    "play:clientbound:entity_status": [
+        "CLIENTBOUND",
+        "PLAY",
+        30
+    ],
+    "play:clientbound:sync_entity_position": [
+        "CLIENTBOUND",
+        "PLAY",
+        31
+    ],
+    "play:clientbound:explosion": [
+        "CLIENTBOUND",
+        "PLAY",
+        32
+    ],
+    "play:clientbound:unload_chunk": [
+        "CLIENTBOUND",
+        "PLAY",
+        33
+    ],
+    "play:clientbound:game_state_change": [
+        "CLIENTBOUND",
+        "PLAY",
+        34
+    ],
+    "play:clientbound:open_horse_window": [
+        "CLIENTBOUND",
+        "PLAY",
+        35
+    ],
+    "play:clientbound:hurt_animation": [
+        "CLIENTBOUND",
+        "PLAY",
+        36
+    ],
+    "play:clientbound:initialize_world_border": [
+        "CLIENTBOUND",
+        "PLAY",
+        37
+    ],
+    "play:clientbound:keep_alive": [
+        "CLIENTBOUND",
+        "PLAY",
+        38
+    ],
+    "play:clientbound:map_chunk": [
+        "CLIENTBOUND",
+        "PLAY",
+        39
+    ],
+    "play:clientbound:world_event": [
+        "CLIENTBOUND",
+        "PLAY",
+        40
+    ],
+    "play:clientbound:world_particles": [
+        "CLIENTBOUND",
+        "PLAY",
+        41
+    ],
+    "play:clientbound:update_light": [
+        "CLIENTBOUND",
+        "PLAY",
+        42
+    ],
+    "play:clientbound:login": [
+        "CLIENTBOUND",
+        "PLAY",
+        43
+    ],
+    "play:clientbound:map": [
+        "CLIENTBOUND",
+        "PLAY",
+        44
+    ],
+    "play:clientbound:trade_list": [
+        "CLIENTBOUND",
+        "PLAY",
+        45
+    ],
+    "play:clientbound:rel_entity_move": [
+        "CLIENTBOUND",
+        "PLAY",
+        46
+    ],
+    "play:clientbound:entity_move_look": [
+        "CLIENTBOUND",
+        "PLAY",
+        47
+    ],
+    "play:clientbound:move_minecart": [
+        "CLIENTBOUND",
+        "PLAY",
+        48
+    ],
+    "play:clientbound:entity_look": [
+        "CLIENTBOUND",
+        "PLAY",
+        49
+    ],
+    "play:clientbound:vehicle_move": [
+        "CLIENTBOUND",
+        "PLAY",
+        50
+    ],
+    "play:clientbound:open_book": [
+        "CLIENTBOUND",
+        "PLAY",
+        51
+    ],
+    "play:clientbound:open_window": [
+        "CLIENTBOUND",
+        "PLAY",
+        52
+    ],
+    "play:clientbound:open_sign_entity": [
+        "CLIENTBOUND",
+        "PLAY",
+        53
+    ],
+    "play:clientbound:ping": [
+        "CLIENTBOUND",
+        "PLAY",
+        54
+    ],
+    "play:clientbound:ping_response": [
+        "CLIENTBOUND",
+        "PLAY",
+        55
+    ],
+    "play:clientbound:craft_recipe_response": [
+        "CLIENTBOUND",
+        "PLAY",
+        56
+    ],
+    "play:clientbound:abilities": [
+        "CLIENTBOUND",
+        "PLAY",
+        57
+    ],
+    "play:clientbound:player_chat": [
+        "CLIENTBOUND",
+        "PLAY",
+        58
+    ],
+    "play:clientbound:end_combat_event": [
+        "CLIENTBOUND",
+        "PLAY",
+        59
+    ],
+    "play:clientbound:enter_combat_event": [
+        "CLIENTBOUND",
+        "PLAY",
+        60
+    ],
+    "play:clientbound:death_combat_event": [
+        "CLIENTBOUND",
+        "PLAY",
+        61
+    ],
+    "play:clientbound:player_remove": [
+        "CLIENTBOUND",
+        "PLAY",
+        62
+    ],
+    "play:clientbound:player_info": [
+        "CLIENTBOUND",
+        "PLAY",
+        63
+    ],
+    "play:clientbound:face_player": [
+        "CLIENTBOUND",
+        "PLAY",
+        64
+    ],
+    "play:clientbound:position": [
+        "CLIENTBOUND",
+        "PLAY",
+        65
+    ],
+    "play:clientbound:player_rotation": [
+        "CLIENTBOUND",
+        "PLAY",
+        66
+    ],
+    "play:clientbound:recipe_book_add": [
+        "CLIENTBOUND",
+        "PLAY",
+        67
+    ],
+    "play:clientbound:recipe_book_remove": [
+        "CLIENTBOUND",
+        "PLAY",
+        68
+    ],
+    "play:clientbound:recipe_book_settings": [
+        "CLIENTBOUND",
+        "PLAY",
+        69
+    ],
+    "play:clientbound:entity_destroy": [
+        "CLIENTBOUND",
+        "PLAY",
+        70
+    ],
+    "play:clientbound:remove_entity_effect": [
+        "CLIENTBOUND",
+        "PLAY",
+        71
+    ],
+    "play:clientbound:reset_score": [
+        "CLIENTBOUND",
+        "PLAY",
+        72
+    ],
+    "play:clientbound:remove_resource_pack": [
+        "CLIENTBOUND",
+        "PLAY",
+        73
+    ],
+    "play:clientbound:add_resource_pack": [
+        "CLIENTBOUND",
+        "PLAY",
+        74
+    ],
+    "play:clientbound:respawn": [
+        "CLIENTBOUND",
+        "PLAY",
+        75
+    ],
+    "play:clientbound:entity_head_rotation": [
+        "CLIENTBOUND",
+        "PLAY",
+        76
+    ],
+    "play:clientbound:multi_block_change": [
+        "CLIENTBOUND",
+        "PLAY",
+        77
+    ],
+    "play:clientbound:select_advancement_tab": [
+        "CLIENTBOUND",
+        "PLAY",
+        78
+    ],
+    "play:clientbound:server_data": [
+        "CLIENTBOUND",
+        "PLAY",
+        79
+    ],
+    "play:clientbound:action_bar": [
+        "CLIENTBOUND",
+        "PLAY",
+        80
+    ],
+    "play:clientbound:world_border_center": [
+        "CLIENTBOUND",
+        "PLAY",
+        81
+    ],
+    "play:clientbound:world_border_lerp_size": [
+        "CLIENTBOUND",
+        "PLAY",
+        82
+    ],
+    "play:clientbound:world_border_size": [
+        "CLIENTBOUND",
+        "PLAY",
+        83
+    ],
+    "play:clientbound:world_border_warning_delay": [
+        "CLIENTBOUND",
+        "PLAY",
+        84
+    ],
+    "play:clientbound:world_border_warning_reach": [
+        "CLIENTBOUND",
+        "PLAY",
+        85
+    ],
+    "play:clientbound:camera": [
+        "CLIENTBOUND",
+        "PLAY",
+        86
+    ],
+    "play:clientbound:update_view_position": [
+        "CLIENTBOUND",
+        "PLAY",
+        87
+    ],
+    "play:clientbound:update_view_distance": [
+        "CLIENTBOUND",
+        "PLAY",
+        88
+    ],
+    "play:clientbound:set_cursor_item": [
+        "CLIENTBOUND",
+        "PLAY",
+        89
+    ],
+    "play:clientbound:spawn_position": [
+        "CLIENTBOUND",
+        "PLAY",
+        90
+    ],
+    "play:clientbound:scoreboard_display_objective": [
+        "CLIENTBOUND",
+        "PLAY",
+        91
+    ],
+    "play:clientbound:entity_metadata": [
+        "CLIENTBOUND",
+        "PLAY",
+        92
+    ],
+    "play:clientbound:attach_entity": [
+        "CLIENTBOUND",
+        "PLAY",
+        93
+    ],
+    "play:clientbound:entity_velocity": [
+        "CLIENTBOUND",
+        "PLAY",
+        94
+    ],
+    "play:clientbound:entity_equipment": [
+        "CLIENTBOUND",
+        "PLAY",
+        95
+    ],
+    "play:clientbound:experience": [
+        "CLIENTBOUND",
+        "PLAY",
+        96
+    ],
+    "play:clientbound:update_health": [
+        "CLIENTBOUND",
+        "PLAY",
+        97
+    ],
+    "play:clientbound:held_item_slot": [
+        "CLIENTBOUND",
+        "PLAY",
+        98
+    ],
+    "play:clientbound:scoreboard_objective": [
+        "CLIENTBOUND",
+        "PLAY",
+        99
+    ],
+    "play:clientbound:set_passengers": [
+        "CLIENTBOUND",
+        "PLAY",
+        100
+    ],
+    "play:clientbound:set_player_inventory": [
+        "CLIENTBOUND",
+        "PLAY",
+        101
+    ],
+    "play:clientbound:teams": [
+        "CLIENTBOUND",
+        "PLAY",
+        102
+    ],
+    "play:clientbound:scoreboard_score": [
+        "CLIENTBOUND",
+        "PLAY",
+        103
+    ],
+    "play:clientbound:simulation_distance": [
+        "CLIENTBOUND",
+        "PLAY",
+        104
+    ],
+    "play:clientbound:set_title_subtitle": [
+        "CLIENTBOUND",
+        "PLAY",
+        105
+    ],
+    "play:clientbound:update_time": [
+        "CLIENTBOUND",
+        "PLAY",
+        106
+    ],
+    "play:clientbound:set_title_text": [
+        "CLIENTBOUND",
+        "PLAY",
+        107
+    ],
+    "play:clientbound:set_title_time": [
+        "CLIENTBOUND",
+        "PLAY",
+        108
+    ],
+    "play:clientbound:entity_sound_effect": [
+        "CLIENTBOUND",
+        "PLAY",
+        109
+    ],
+    "play:clientbound:sound_effect": [
+        "CLIENTBOUND",
+        "PLAY",
+        110
+    ],
+    "play:clientbound:start_configuration": [
+        "CLIENTBOUND",
+        "PLAY",
+        111
+    ],
+    "play:clientbound:stop_sound": [
+        "CLIENTBOUND",
+        "PLAY",
+        112
+    ],
+    "play:clientbound:store_cookie": [
+        "CLIENTBOUND",
+        "PLAY",
+        113
+    ],
+    "play:clientbound:system_chat": [
+        "CLIENTBOUND",
+        "PLAY",
+        114
+    ],
+    "play:clientbound:playerlist_header": [
+        "CLIENTBOUND",
+        "PLAY",
+        115
+    ],
+    "play:clientbound:nbt_query_response": [
+        "CLIENTBOUND",
+        "PLAY",
+        116
+    ],
+    "play:clientbound:collect": [
+        "CLIENTBOUND",
+        "PLAY",
+        117
+    ],
+    "play:clientbound:entity_teleport": [
+        "CLIENTBOUND",
+        "PLAY",
+        118
+    ],
+    "play:clientbound:test_instance_block_status": [
+        "CLIENTBOUND",
+        "PLAY",
+        119
+    ],
+    "play:clientbound:set_ticking_state": [
+        "CLIENTBOUND",
+        "PLAY",
+        120
+    ],
+    "play:clientbound:step_tick": [
+        "CLIENTBOUND",
+        "PLAY",
+        121
+    ],
+    "play:clientbound:transfer": [
+        "CLIENTBOUND",
+        "PLAY",
+        122
+    ],
+    "play:clientbound:advancements": [
+        "CLIENTBOUND",
+        "PLAY",
+        123
+    ],
+    "play:clientbound:entity_update_attributes": [
+        "CLIENTBOUND",
+        "PLAY",
+        124
+    ],
+    "play:clientbound:entity_effect": [
+        "CLIENTBOUND",
+        "PLAY",
+        125
+    ],
+    "play:clientbound:declare_recipes": [
+        "CLIENTBOUND",
+        "PLAY",
+        126
+    ],
+    "play:clientbound:tags": [
+        "CLIENTBOUND",
+        "PLAY",
+        127
+    ],
+    "play:clientbound:set_projectile_power": [
+        "CLIENTBOUND",
+        "PLAY",
+        128
+    ],
+    "play:clientbound:custom_report_details": [
+        "CLIENTBOUND",
+        "PLAY",
+        129
+    ],
+    "play:clientbound:server_links": [
+        "CLIENTBOUND",
+        "PLAY",
+        130
+    ],
+    "play:clientbound:tracked_waypoint": [
+        "CLIENTBOUND",
+        "PLAY",
+        131
+    ],
+    "play:clientbound:clear_dialog": [
+        "CLIENTBOUND",
+        "PLAY",
+        132
+    ],
+    "play:clientbound:show_dialog": [
+        "CLIENTBOUND",
+        "PLAY",
+        133
+    ],
+    "play:serverbound:teleport_confirm": [
+        "SERVERBOUND",
+        "PLAY",
+        0
+    ],
+    "play:serverbound:query_block_nbt": [
+        "SERVERBOUND",
+        "PLAY",
+        1
+    ],
+    "play:serverbound:select_bundle_item": [
+        "SERVERBOUND",
+        "PLAY",
+        2
+    ],
+    "play:serverbound:set_difficulty": [
+        "SERVERBOUND",
+        "PLAY",
+        3
+    ],
+    "play:serverbound:change_gamemode": [
+        "SERVERBOUND",
+        "PLAY",
+        4
+    ],
+    "play:serverbound:message_acknowledgement": [
+        "SERVERBOUND",
+        "PLAY",
+        5
+    ],
+    "play:serverbound:chat_command": [
+        "SERVERBOUND",
+        "PLAY",
+        6
+    ],
+    "play:serverbound:chat_command_signed": [
+        "SERVERBOUND",
+        "PLAY",
+        7
+    ],
+    "play:serverbound:chat_message": [
+        "SERVERBOUND",
+        "PLAY",
+        8
+    ],
+    "play:serverbound:chat_session_update": [
+        "SERVERBOUND",
+        "PLAY",
+        9
+    ],
+    "play:serverbound:chunk_batch_received": [
+        "SERVERBOUND",
+        "PLAY",
+        10
+    ],
+    "play:serverbound:client_command": [
+        "SERVERBOUND",
+        "PLAY",
+        11
+    ],
+    "play:serverbound:tick_end": [
+        "SERVERBOUND",
+        "PLAY",
+        12
+    ],
+    "play:serverbound:settings": [
+        "SERVERBOUND",
+        "PLAY",
+        13
+    ],
+    "play:serverbound:tab_complete": [
+        "SERVERBOUND",
+        "PLAY",
+        14
+    ],
+    "play:serverbound:configuration_acknowledged": [
+        "SERVERBOUND",
+        "PLAY",
+        15
+    ],
+    "play:serverbound:enchant_item": [
+        "SERVERBOUND",
+        "PLAY",
+        16
+    ],
+    "play:serverbound:window_click": [
+        "SERVERBOUND",
+        "PLAY",
+        17
+    ],
+    "play:serverbound:close_window": [
+        "SERVERBOUND",
+        "PLAY",
+        18
+    ],
+    "play:serverbound:set_slot_state": [
+        "SERVERBOUND",
+        "PLAY",
+        19
+    ],
+    "play:serverbound:cookie_response": [
+        "SERVERBOUND",
+        "PLAY",
+        20
+    ],
+    "play:serverbound:custom_payload": [
+        "SERVERBOUND",
+        "PLAY",
+        21
+    ],
+    "play:serverbound:debug_sample_subscription": [
+        "SERVERBOUND",
+        "PLAY",
+        22
+    ],
+    "play:serverbound:edit_book": [
+        "SERVERBOUND",
+        "PLAY",
+        23
+    ],
+    "play:serverbound:query_entity_nbt": [
+        "SERVERBOUND",
+        "PLAY",
+        24
+    ],
+    "play:serverbound:use_entity": [
+        "SERVERBOUND",
+        "PLAY",
+        25
+    ],
+    "play:serverbound:generate_structure": [
+        "SERVERBOUND",
+        "PLAY",
+        26
+    ],
+    "play:serverbound:keep_alive": [
+        "SERVERBOUND",
+        "PLAY",
+        27
+    ],
+    "play:serverbound:lock_difficulty": [
+        "SERVERBOUND",
+        "PLAY",
+        28
+    ],
+    "play:serverbound:position": [
+        "SERVERBOUND",
+        "PLAY",
+        29
+    ],
+    "play:serverbound:position_look": [
+        "SERVERBOUND",
+        "PLAY",
+        30
+    ],
+    "play:serverbound:look": [
+        "SERVERBOUND",
+        "PLAY",
+        31
+    ],
+    "play:serverbound:flying": [
+        "SERVERBOUND",
+        "PLAY",
+        32
+    ],
+    "play:serverbound:vehicle_move": [
+        "SERVERBOUND",
+        "PLAY",
+        33
+    ],
+    "play:serverbound:steer_boat": [
+        "SERVERBOUND",
+        "PLAY",
+        34
+    ],
+    "play:serverbound:pick_item_from_block": [
+        "SERVERBOUND",
+        "PLAY",
+        35
+    ],
+    "play:serverbound:pick_item_from_entity": [
+        "SERVERBOUND",
+        "PLAY",
+        36
+    ],
+    "play:serverbound:ping_request": [
+        "SERVERBOUND",
+        "PLAY",
+        37
+    ],
+    "play:serverbound:craft_recipe_request": [
+        "SERVERBOUND",
+        "PLAY",
+        38
+    ],
+    "play:serverbound:abilities": [
+        "SERVERBOUND",
+        "PLAY",
+        39
+    ],
+    "play:serverbound:block_dig": [
+        "SERVERBOUND",
+        "PLAY",
+        40
+    ],
+    "play:serverbound:entity_action": [
+        "SERVERBOUND",
+        "PLAY",
+        41
+    ],
+    "play:serverbound:player_input": [
+        "SERVERBOUND",
+        "PLAY",
+        42
+    ],
+    "play:serverbound:player_loaded": [
+        "SERVERBOUND",
+        "PLAY",
+        43
+    ],
+    "play:serverbound:pong": [
+        "SERVERBOUND",
+        "PLAY",
+        44
+    ],
+    "play:serverbound:recipe_book": [
+        "SERVERBOUND",
+        "PLAY",
+        45
+    ],
+    "play:serverbound:displayed_recipe": [
+        "SERVERBOUND",
+        "PLAY",
+        46
+    ],
+    "play:serverbound:name_item": [
+        "SERVERBOUND",
+        "PLAY",
+        47
+    ],
+    "play:serverbound:resource_pack_receive": [
+        "SERVERBOUND",
+        "PLAY",
+        48
+    ],
+    "play:serverbound:advancement_tab": [
+        "SERVERBOUND",
+        "PLAY",
+        49
+    ],
+    "play:serverbound:select_trade": [
+        "SERVERBOUND",
+        "PLAY",
+        50
+    ],
+    "play:serverbound:set_beacon_effect": [
+        "SERVERBOUND",
+        "PLAY",
+        51
+    ],
+    "play:serverbound:held_item_slot": [
+        "SERVERBOUND",
+        "PLAY",
+        52
+    ],
+    "play:serverbound:update_command_block": [
+        "SERVERBOUND",
+        "PLAY",
+        53
+    ],
+    "play:serverbound:update_command_block_minecart": [
+        "SERVERBOUND",
+        "PLAY",
+        54
+    ],
+    "play:serverbound:set_creative_slot": [
+        "SERVERBOUND",
+        "PLAY",
+        55
+    ],
+    "play:serverbound:update_jigsaw_block": [
+        "SERVERBOUND",
+        "PLAY",
+        56
+    ],
+    "play:serverbound:update_structure_block": [
+        "SERVERBOUND",
+        "PLAY",
+        57
+    ],
+    "play:serverbound:set_test_block": [
+        "SERVERBOUND",
+        "PLAY",
+        58
+    ],
+    "play:serverbound:update_sign": [
+        "SERVERBOUND",
+        "PLAY",
+        59
+    ],
+    "play:serverbound:arm_animation": [
+        "SERVERBOUND",
+        "PLAY",
+        60
+    ],
+    "play:serverbound:spectate": [
+        "SERVERBOUND",
+        "PLAY",
+        61
+    ],
+    "play:serverbound:test_instance_block_action": [
+        "SERVERBOUND",
+        "PLAY",
+        62
+    ],
+    "play:serverbound:block_place": [
+        "SERVERBOUND",
+        "PLAY",
+        63
+    ],
+    "play:serverbound:use_item": [
+        "SERVERBOUND",
+        "PLAY",
+        64
+    ],
+    "play:serverbound:custom_click_action": [
+        "SERVERBOUND",
+        "PLAY",
+        65
+    ]
+}

@@ -1,71 +1,112 @@
-import contextlib
+import itertools
 import json
-import sys
 from pathlib import Path
-from typing import Any
+from typing import Self
 
-BLOCK_PATH = Path(__file__).parent / "block.json"
+from pythonium.registries.base import Registry
+
+type BlockProperty = str | bool
+type BlockStateId = int
 
 
-class BlockRegistry:
-    """Class for managing block registry."""
+class BlockRegistry(Registry[BlockStateId]):
+    """Block registry."""
 
-    __slots__ = ("_registry",)
+    __registry_path__ = Path(__file__).parent / "block.json"
 
     def __init__(self) -> None:
-        self._registry: dict[
-            str, tuple[int, dict[str, tuple[list[str], int]]]
-        ] = {}
-        self._load_registry()
+        super().__init__()
+        self.id_to_item_id: dict[int, int] = {}
+        self.name_to_default_id: dict[str, int] = {}
 
-    def _load_registry(self) -> None:
-        with BLOCK_PATH.open("r", encoding="utf-8") as f:
-            data = json.load(f)
+    def discover(self) -> Self:
+        with self.__registry_path__.open(encoding="utf-8") as f:
+            blocks_data: list[dict] = json.load(f)
 
-        for block in data:
-            name = sys.intern(f"minecraft:{block['name']}")
-            min_id = block["minStateId"]
+        for block in blocks_data:
+            block_name = f"minecraft:{block['name']}"
             states = block.get("states", [])
+            min_state_id = block["minStateId"]
 
-            weights: list[int] = []
-            current_weight = 1
-            for state in reversed(states):
-                weights.insert(0, current_weight)
-                current_weight *= state["num_values"]
+            self.name_to_default_id[block_name] = block.get(
+                "defaultState",
+                min_state_id,
+            )
 
-            block_props = {}
-            for i, state in enumerate(states):
-                p_name = state["name"]
+            sorted_states = sorted(states, key=lambda s: s["name"])
+            property_names = [state["name"] for state in sorted_states]
 
+            property_values: list[list[str]] = []
+            for state in sorted_states:
                 if state["type"] == "bool":
-                    values = ["true", "false"]
+                    property_values.append(["true", "false"])
                 else:
-                    values = state.get("values", [])
+                    property_values.append(state["values"])
 
-                block_props[p_name] = (values, weights[i])
+            combinations = (
+                itertools.product(*property_values)
+                if property_values
+                else [()]
+            )
 
-            self._registry[name] = (min_id, block_props)
+            for combination in combinations:
+                if property_names:
+                    properties = ",".join(
+                        f"{name}={value}"
+                        for name, value in zip(
+                            property_names,
+                            combination,
+                            strict=False,
+                        )
+                    )
+                    key = f"{block_name}[{properties}]"
+                else:
+                    key = block_name
 
-    def get_id(self, name: str, **kwargs: Any) -> int:  # noqa: ANN401
+                offset = 0
+                multiplier = 1
+
+                for state in reversed(sorted_states):
+                    values = (
+                        ["true", "false"]
+                        if state["type"] == "bool"
+                        else state["values"]
+                    )
+
+                    value = combination[property_names.index(state["name"])]
+                    offset += values.index(value) * multiplier
+                    multiplier *= len(values)
+
+                state_id = min_state_id + offset
+
+                self.register(key, state_id)
+
+                drops = block.get("drops")
+                if drops:
+                    self.id_to_item_id[state_id] = drops[0]
+
+        return self
+
+    def get_drop_for_state(self, state_id: int) -> int:
+        return self.id_to_item_id.get(state_id, 0)
+
+    def get_id(
+        self,
+        name: str,
+        **properties: BlockProperty,
+    ) -> int:
         if ":" not in name:
             name = f"minecraft:{name}"
 
-        res = self._registry.get(name)
-        if not res:
-            return 0
+        if not properties:
+            return self.name_to_default_id.get(name, 0)
 
-        min_id, props = res
-        offset = 0
+        props = ",".join(
+            f"{key}={str(value).lower()}"
+            for key, value in sorted(properties.items())
+        )
 
-        for p_name, (values, weight) in props.items():
-            val = kwargs.get(p_name)
-            if val is not None:
-                val_str = str(val).lower()
-                with contextlib.suppress(ValueError):
-                    offset += values.index(val_str) * weight
-
-        return min_id + offset
+        return self.get(f"{name}[{props}]")
 
 
-# цель: плоский словарь {"minecraft:dirt[snowy=false]": 10}
-BLOCK_REGISTRY = BlockRegistry()
+BLOCK_REGISTRY = BlockRegistry().discover()

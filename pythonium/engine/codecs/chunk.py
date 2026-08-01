@@ -1,4 +1,5 @@
 import struct
+from functools import cache
 
 from msgspec import Struct
 
@@ -17,6 +18,11 @@ from pythonium.engine.codecs.primitives import (
 from pythonium.engine.typealiases import Deserialized
 
 
+@cache
+def get_struct(length: int) -> struct.Struct:
+    return struct.Struct(f">{length}Q")
+
+
 class HeightmapsCodec(Codec[dict[str, list[int]]]):
     """Encodes Heightmaps as Network Map<String, LongArray>."""
 
@@ -33,16 +39,17 @@ class HeightmapsCodec(Codec[dict[str, list[int]]]):
         self.long_array: ArrayCodec = ArrayCodec(LongCodec())
 
     def serialize(self, *, field: dict[str, list[int]]) -> bytes:
-        out = bytearray()
-        out.extend(self.varint.serialize(field=len(field)))
+        parts = [self.varint.serialize(field=len(field))]
 
         for key, longs in field.items():
-            out.extend(self.varint.serialize(field=self._HEIGHTMAP_TYPES[key]))
+            parts.append(
+                self.varint.serialize(field=self._HEIGHTMAP_TYPES[key])
+            )
+            parts.append(self.varint.serialize(field=len(longs)))
 
-            out.extend(self.varint.serialize(field=len(longs)))
-            out.extend(struct.pack(f">{len(longs)}Q", *longs))
+            parts.append(get_struct(len(longs)).pack(*longs))
 
-        return bytes(out)
+        return b"".join(parts)
 
     def deserialize(self, data: bytes) -> Deserialized[dict[str, list[int]]]:
         length, offset = self.varint.deserialize(data)

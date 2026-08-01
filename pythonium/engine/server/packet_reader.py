@@ -12,9 +12,11 @@ from pythonium.engine.packets import Packet, PacketStorage, deserialize
 
 logger = getLogger(__name__)
 
+# sorry but credits for chatgpt 4o cuz im very stupid to build this systems :(
+
 
 class PacketReader:
-    """High-performance packet reader using a sliding window buffer."""
+    """Packet reader."""
 
     def __init__(self, reader: StreamReader) -> None:
         self._reader = reader
@@ -90,7 +92,7 @@ class PacketReader:
                     self.read_packet_data(), timeout=20.0
                 )
             except TimeoutError:
-                logger.warning("Client timed out (no packets for 20s).")
+                logger.warning("client timed out.")
                 return
             except (asyncio.IncompleteReadError, ConnectionError):
                 return

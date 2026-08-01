@@ -68,13 +68,18 @@ def _setup_asyncio_loop() -> None:
     logger = logging.getLogger(name=__name__)
 
     with contextlib.suppress(ImportError):
-        loop = importlib.import_module("uvloop")
+        if sys.platform in ("win32", "cygwin"):
+            loop = importlib.import_module("winloop")
+        else:
+            loop = importlib.import_module("uvloop")
 
         loop.install()
         return logger.info("Using %s", loop.__name__)
 
     return logger.info(
-        "Using default asyncio loop. Recommended to install `uvloop` (Linux)"
+        "Using default asyncio loop. Recommended to "
+        "install `uvloop` (Linux) or"
+        "`winloop` (Windows)"
     )
 
 

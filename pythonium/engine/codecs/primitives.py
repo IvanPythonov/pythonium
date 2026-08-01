@@ -68,6 +68,16 @@ class LongCodec(PrimitiveCodec[int]):
     Signed 64-bit integer, two's complement.
     """
 
+    __format_character__ = ">q"
+
+
+class UnsignedLongCodec(PrimitiveCodec[int]):
+    """
+    Unsigned long type implementation with Minecraft protocol serialization.
+
+    Unsigned 64-bit integer, two's complement.
+    """
+
     __format_character__ = ">Q"
 
 

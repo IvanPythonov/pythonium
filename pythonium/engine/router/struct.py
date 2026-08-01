@@ -1,32 +1,31 @@
 import inspect
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from pythonium.engine.typealiases import Handler
+from pythonium.registries.base import Registry
+
+if TYPE_CHECKING:
+    from pythonium.engine.client import Client
+    from pythonium.engine.server.di import Container
 
 
 class HandlerStruct:
     """Struct for storing handler and its kwargs."""
 
-    def __init__(self, func: Handler, kwargs: dict[str, Any]) -> None:
+    def __init__(self, func: Handler) -> None:
         self.func = func
 
-        self._kwargs_signature = self._get_func_params()
+        self.needed_params = frozenset(
+            inspect.signature(self.func).parameters.keys()
+        )
 
-        self.needs_client = "client" in self._kwargs_signature
-
-        self.kwargs = {
-            k: v for k, v in kwargs.items() if k in self._kwargs_signature
-        }
-
-    async def __call__(self, *args: Any, **dynamic_kwargs: Any) -> None:  # noqa: ANN401
+    async def __call__(
+        self,
+        *args: Any,  # noqa: ANN401
+        container: Container,
+        client: Client | None = None,
+    ) -> None | Registry:
         """Get handler with partial kwargs."""
-        to_pass = {}
+        kwargs = container.resolve_kwargs(self.needed_params, client=client)
 
-        if self.needs_client:
-            to_pass["client"] = dynamic_kwargs["client"]
-
-        return await self.func(*args, **self.kwargs, **to_pass)
-
-    def _get_func_params(self) -> frozenset[str]:
-        """Get kwargs and return frozenset."""
-        return frozenset(inspect.signature(self.func).parameters.keys())
+        return await self.func(*args, **kwargs)

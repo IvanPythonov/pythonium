@@ -27,31 +27,32 @@ class SlotCodec(Codec[SlotStruct]):
     """Codec for the Slot type."""
 
     def __init__(self) -> None:
-        self.varint_codec = VarIntCodec()
+        self.varint = VarIntCodec()
 
     def serialize(self, *, field: SlotStruct) -> bytes:
         if field.item_count <= 0 or field.item_id is None:
-            return self.varint_codec.serialize(field=0)
+            return self.varint.serialize(field=0)
 
-        chunks = [
-            self.varint_codec.serialize(field=field.item_count),
-            self.varint_codec.serialize(field=field.item_id),
-            self.varint_codec.serialize(field=0),
-            self.varint_codec.serialize(field=0),
-        ]
+        out = bytearray()
 
-        return b"".join(chunks)
+        out.extend(self.varint.serialize(field=field.item_count))
+
+        out.extend(self.varint.serialize(field=field.item_id))
+
+        out.extend(self.varint.serialize(field=0))
+        out.extend(self.varint.serialize(field=0))
+        return bytes(out)
 
     def deserialize(self, data: bytes) -> Deserialized[SlotStruct]:
-        count, offset = self.varint_codec.deserialize(data)
+        count, offset = self.varint.deserialize(data)
 
         if count <= 0:
             return SlotStruct(item_count=0, item_id=None), offset
 
-        item_id, consumed = self.varint_codec.deserialize(data[offset:])
+        item_id, consumed = self.varint.deserialize(data[offset:])
         offset += consumed
 
-        added_components_count, consumed = self.varint_codec.deserialize(
+        added_components_count, consumed = self.varint.deserialize(
             data[offset:]
         )
         offset += consumed
@@ -61,13 +62,13 @@ class SlotCodec(Codec[SlotStruct]):
 
             raise NotImplementedError(msg)
 
-        removed_components_count, consumed = self.varint_codec.deserialize(
+        removed_components_count, consumed = self.varint.deserialize(
             data[offset:]
         )
         offset += consumed
 
         for _ in range(removed_components_count):
-            _, consumed = self.varint_codec.deserialize(data[offset:])
+            _, consumed = self.varint.deserialize(data[offset:])
             offset += consumed
 
         return SlotStruct(item_count=count, item_id=item_id), offset
@@ -77,7 +78,7 @@ class AddedComponentStruct(Struct):
     """Added component struct."""
 
     component_type: int  # VarInt Enum
-    component_data_hash: int  # Int (CRC32C)
+    component_data_hash: int  # Int
 
 
 class AddedComponentCodec(Codec[AddedComponentStruct]):
@@ -186,3 +187,6 @@ class ChangedSlotCodec(Codec[ChangedSlotStruct]):
         slot_num, c1 = self.short.deserialize(data)
         slot_data, c2 = self.hashed_slot.deserialize(data[c1:])
         return ChangedSlotStruct(slot_num, slot_data), c1 + c2
+
+
+# TODO(IvanPythonov): fix types in codec's struct

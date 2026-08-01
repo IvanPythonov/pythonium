@@ -1,21 +1,24 @@
-# TODO
+# Pythonium TODO tasks
 
-- some architecture refactor
-  - zerocopy serialization and serialization factory
-  - routers dont send any packets (services implement)
-- repositories n services
-- storages implement
-- LIGTNING ENGINE (SUCKS)
-- chunk sender rework (papermc like)
-  - Movement -> ChunkMap -> ChunkHolder
-  - ChunkHolder (EMPTY → LOADING → GENERATED → FULL → SENT) just a struct
-  - ChunkTaskScheduler (worker threads, closer to the player = earlier)
-  - max ~20–40 chunks per tick
-- entities
-  - entity metadata (fuck)
-- rate limiting (clientbound)
-- router.task or cool task manager
-- implement cache
-- hide players count parameter (dont send players count key)
-- profile class in client session
-- update chunk method
+### Todo
+
+- [ ] storages implement
+- [ ] LIGTNING ENGINE (SUCKS)
+- [ ] chunk sender rework (papermc like)
+- [ ] entity metadata (fuck)
+- [ ] rate limiting (clientbound)
+- [ ] implement cache
+- [ ] hide players count parameter (dont send players count key)
+- [ ] profile class in client session
+
+### In Progress
+
+- [ ] routers dont send any packets (services implement)
+- [ ] repositories n services
+- [ ] router.task or cool task manager
+- [ ] router.registry and centralized registry system
+
+### Done
+
+- [x] zerocopy serialization and serialization factory (success
+- [x] update chunk method

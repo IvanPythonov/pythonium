@@ -29,7 +29,9 @@ async def chat_command_handler(
 
         await client.send(
             Abilities(
-                flags=0x04, flying_speed=float(fly_speed), walking_speed=0.1
+                flags=0x04,
+                flying_speed=float(fly_speed),
+                walking_speed=0.1,
             )
         )
     elif command == "walk":
@@ -66,12 +68,16 @@ async def chat_command_handler(
 
 @router.on(ChatMessage)
 async def on_chat_message(chat_message: ChatMessage, client: Client) -> None:
+    player = client.player if client.has_player else None
+    if player is None:
+        raise ImpossibleError(actually="is impossible")
+
+    session = player.session
+
     await client.send(
         SystemChat(
             content={
-                "text": String(
-                    f"<{client.session.username}>: {chat_message.message}"
-                )
+                "text": String(f"<{session.username}> {chat_message.message}")
             },
             is_action_bar=False,
         )

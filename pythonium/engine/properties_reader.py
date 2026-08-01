@@ -33,6 +33,7 @@ class WorldProperties(KebabStruct):
     difficulty: Literal["peaceful", "easy", "normal", "hard"]
     seed: int
     hardcore: bool
+    world_type: Literal["flat", "noise"]
 
 
 class PerformanceProperties(KebabStruct):

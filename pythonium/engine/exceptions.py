@@ -103,3 +103,9 @@ class ImpossibleError(Error):
     """Exception not raised."""
 
     message = "A stub for typecheckers like Mypy, but the code actually works."
+
+
+class EmptyBroadcastError(Error):
+    """Empty broadcast error."""
+
+    message = "Empty broadcast error."

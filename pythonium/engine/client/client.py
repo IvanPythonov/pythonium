@@ -12,8 +12,7 @@ from pythonium.engine.packets.outgoing import (
     LoginDisconnect,
     PlayDisconnect,
 )
-from pythonium.engine.packets.outgoing.play import MultiBlockChange
-from pythonium.worldgen.terrain.base import Chunk
+from pythonium.engine.player.player import Player
 
 _KICK_FACTORIES: dict[
     State,
@@ -33,19 +32,22 @@ class Client:
     """Class representing Minecraft client."""
 
     def __init__(
-        self, connection: ClientConnection, session: ClientSession
+        self,
+        connection: ClientConnection,
+        session: ClientSession,
     ) -> None:
         self.connection = connection
         self.session = session
 
-        self.unique_id = connection.address
+        self.address = connection.address
+        self.player: Player | None = None
 
     async def kick(self, reason: str) -> None:
         packet_factory = _KICK_FACTORIES.get(self.session.state)
 
         if not packet_factory:
             raise KickError(
-                info="Wrong state for kicking (maybe status).",
+                info="wrong state for kicking (maybe status or handshake).",
                 state=self.session.state,
             )
 
@@ -58,8 +60,12 @@ class Client:
         await self.connection.write(serialize(packet))
 
     async def send_many(self, *packets: Packet) -> None:
-        for packet in packets:
-            await self.send(packet=packet)
+        data_list = [serialize(packet) for packet in packets]
+        await self.connection.write_many(data_list)
 
     async def disconnect(self) -> None:
         await self.connection.disconnect()
+
+    @property
+    def has_player(self) -> bool:
+        return self.player is not None

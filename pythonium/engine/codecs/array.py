@@ -7,7 +7,7 @@ from pythonium.engine.typealiases import Deserialized
 
 
 class ArrayCodec[T](Codec[list[T]]):
-    """Codec for list/array types."""
+    """Aray codec."""
 
     def __init__(
         self,
@@ -16,47 +16,61 @@ class ArrayCodec[T](Codec[list[T]]):
     ) -> None:
         self.length_codec = length_codec or VarIntCodec()
 
-        self.codecs: Sequence[Codec] | None
-        self.single: Codec | None
+        self.codecs: Sequence[Codec] | None = None
+        self.single: Codec | None = None
 
         if isinstance(element_codec, (list, tuple)):
             self.codecs = element_codec
-            self.single = None
         else:
-            self.codecs = None
-            self.single = element_codec  # ignore: type[assignment]
+            self.single = element_codec  # type: ignore[assignment]
 
     def serialize(self, field: list[T]) -> bytes:
-        chunks = [self.length_codec.serialize(field=len(field))]
+        length_bytes = self.length_codec.serialize(field=len(field))
+
+        if self.single:
+            _serialize = self.single.serialize
+            chunks = [_serialize(field=item) for item in field]
+
+            return b"".join([length_bytes, *chunks])
 
         if self.codecs:
+            chunks = [length_bytes]
+            _append = chunks.append
+            _codecs = self.codecs
             for item in field:
                 iterable_item = cast("Iterable[Any]", item)
-
                 for codec, sub_item in zip(
-                    self.codecs, iterable_item, strict=False
+                    _codecs, iterable_item, strict=False
                 ):
-                    chunks.append(codec.serialize(field=sub_item))
-        elif self.single:
-            chunks.extend(self.single.serialize(field=item) for item in field)
+                    _append(codec.serialize(field=sub_item))
+            return b"".join(chunks)
 
-        return b"".join(chunks)
+        return length_bytes
 
     def deserialize(self, data: bytes) -> Deserialized[list[T]]:
         length, offset = self.length_codec.deserialize(data)
-        result = []
 
-        for _ in range(length):
-            if self.codecs:
-                row = []
-                for codec in self.codecs:
-                    val, consumed = codec.deserialize(data[offset:])
-                    row.append(val)
-                    offset += consumed
-                result.append(tuple(row))  # type: ignore[arg-type]
-            elif self.single:
-                val, consumed = self.single.deserialize(data[offset:])
-                result.append(val)
+        if length == 0:
+            return [], offset
+
+        result: list[T] = []
+        _append = result.append
+
+        if self.single:
+            _deserialize = self.single.deserialize
+            for _ in range(length):
+                val, consumed = _deserialize(data[offset:])
+                _append(val)
                 offset += consumed
+        elif self.codecs:
+            _codecs = self.codecs
+            for _ in range(length):
+                row: list[Any] = []
+                _row_append = row.append
+                for codec in _codecs:
+                    val, consumed = codec.deserialize(data[offset:])
+                    _row_append(val)
+                    offset += consumed
+                _append(tuple(row))  # type: ignore[arg-type]
 
         return result, offset  # type: ignore[return-value]

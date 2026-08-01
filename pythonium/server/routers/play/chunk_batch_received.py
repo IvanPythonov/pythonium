@@ -11,7 +11,4 @@ router = Router(name=__name__)
 async def chunk_batch_received_handler(
     _chunk_batch: ChunkBatchReceived, client: Client
 ) -> None:
-    chunk_ack_future = client.session.chunk_ack_future
-
-    if chunk_ack_future and not chunk_ack_future.done():
-        chunk_ack_future.set_result(True)
+    pass

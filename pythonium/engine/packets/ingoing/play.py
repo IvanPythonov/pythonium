@@ -3,8 +3,10 @@ from typing import ClassVar
 from pythonium.engine.enums.action_id import ActionId
 from pythonium.engine.enums.block_action import BlockActionStatus, Rotation
 from pythonium.engine.enums.difficulty import DifficultyEnum
+from pythonium.engine.enums.face_block import BlockFace
 from pythonium.engine.enums.gamemode import GameMode
 from pythonium.engine.enums.placement import PlacementFlags
+from pythonium.engine.enums.player_action import PlayerActionStatus
 from pythonium.engine.enums.use_entity import Hand, UseEntityAction
 from pythonium.engine.packets.base import Packet
 from pythonium.engine.types import (
@@ -428,9 +430,9 @@ class BlockDig(Packet, kw_only=True):
 
     __packet_name__: ClassVar[str] = "play:serverbound:block_dig"
 
-    status: VarInt
+    status: PlayerActionStatus
     location: PositionType
-    face: Byte
+    face: BlockFace
     sequence: VarInt
 
 
@@ -680,7 +682,7 @@ class BlockPlace(Packet, kw_only=True):
 
     hand: VarInt
     location: PositionType
-    direction_: VarInt
+    direction_: BlockFace
 
     cursor_x: Float
     cursor_y: Float

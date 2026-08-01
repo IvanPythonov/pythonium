@@ -84,6 +84,33 @@ class ChunkSection:
         longs = array("Q", [0] * long_count)
         mask = (1 << bpe) - 1
 
+        if bpe == 4:  # TODO(IvanPythonov): bpe enum or smthing
+            arr = (
+                entries if isinstance(entries, array) else array("H", entries)
+            )
+
+            longs = array("Q", [0] * 256)
+
+            for i in range(16):
+                chunk_part = array("Q", arr[i::16])
+                for idx in range(256):
+                    longs[idx] |= chunk_part[idx] << (i * 4)
+
+            longs.byteswap()
+            return longs.tobytes()
+
+        if bpe == 8:  # TODO(IvanPythonov): bpe enum or smthing
+            arr = (
+                entries if isinstance(entries, array) else array("H", entries)
+            )
+            longs = array("Q", [0] * 512)
+            for i in range(8):
+                chunk_part = array("Q", arr[i::8])
+                for idx in range(512):
+                    longs[idx] |= chunk_part[idx] << (i * 8)
+            longs.byteswap()
+            return longs.tobytes()
+
         for val in entries:
             longs[current_long_idx] |= (val & mask) << current_bit_offset
             current_bit_offset += bpe

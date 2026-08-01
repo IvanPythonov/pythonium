@@ -1,13 +1,11 @@
 from pathlib import Path
-from typing import Any
+from typing import Any, Self
 
 import msgspec
-from nbtlib import Base, Byte, Compound, Double, Int, List, String, parse_nbt
+from nbtlib import Base, Byte, Compound, Double, Int, List, String
 
 from pythonium.engine.packets.outgoing import RegistryData
-
-REGISTRIES_FILE = Path(__file__).parent / "registries.json"
-REGISTRIES_NBT = parse_nbt(REGISTRIES_FILE.read_text(encoding="utf-8"))
+from pythonium.registries.base import Registry
 
 _PRIMITIVE_FACTORY = {
     int: Int,
@@ -17,7 +15,7 @@ _PRIMITIVE_FACTORY = {
 }
 
 
-def _convert_value(value: Any) -> Base:  # noqa: ANN401
+def _convert_value(value: object) -> Base:
     if isinstance(value, dict):
         return Compound({k: _convert_value(v) for k, v in value.items()})
 
@@ -25,9 +23,8 @@ def _convert_value(value: Any) -> Base:  # noqa: ANN401
         if not value:
             return List[String]()
 
-        converted_list = [_convert_value(v) for v in value]
-        list_type = type(converted_list[0])
-        return List[list_type](converted_list)
+        converted = [_convert_value(v) for v in value]
+        return List[type(converted[0])](converted)
 
     if isinstance(value, (int, float, str, bool)):
         return _PRIMITIVE_FACTORY[type(value)](value)
@@ -42,24 +39,36 @@ def json_to_nbt(json_data: dict[str, Any]) -> Compound:
     return _convert_value(json_data)
 
 
-def build_registry_packets() -> list[RegistryData]:
-    packets: list[RegistryData] = []
+class RegistryRegistry(Registry[RegistryData]):
+    """Registry data registry."""
 
-    with REGISTRIES_FILE.open("r", encoding="utf-8") as f:
-        registries_data: dict[str, dict[str, Any]] = msgspec.json.decode(
-            f.read()
+    __registry_path__ = Path(__file__).parent / "registries.json"
+
+    def discover(self) -> Self:
+        data: dict[str, dict[str, Any]] = msgspec.json.decode(
+            self.__registry_path__.read_bytes()
         )
 
-    for registry_id, entries_dict in registries_data.items():
-        entries: list[tuple[str, Compound | None]] = []
+        for registry_id, entries_dict in data.items():
+            entries: list[tuple[str, Compound | None]] = []
 
-        for entry_id, entry_data in entries_dict.items():
-            entry_nbt = json_to_nbt(entry_data)
-            entries.append((entry_id, entry_nbt))
+            for entry_id, entry_data in entries_dict.items():
+                entries.append(
+                    (
+                        entry_id,
+                        json_to_nbt(entry_data),
+                    )
+                )
 
-        packets.append(RegistryData(registry_id=registry_id, entries=entries))
+            self.register(
+                registry_id,
+                RegistryData(
+                    registry_id=registry_id,
+                    entries=entries,
+                ),
+            )
 
-    return packets
+        return self
 
 
-REGISTRY_PACKETS = build_registry_packets()
+REGISTRY_REGISTRY = RegistryRegistry().discover()

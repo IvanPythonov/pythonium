@@ -1,5 +1,6 @@
 from typing import ClassVar
 
+from pythonium.engine.enums.abilities import AbilitiesFlags
 from pythonium.engine.enums.advancements import AdvancementRoot
 from pythonium.engine.enums.difficulty import DifficultyEnum
 from pythonium.engine.enums.face_player import LookAt
@@ -18,6 +19,7 @@ from pythonium.engine.types import (
     ChunkBiomeDataArray,
     CommandMatchArray,
     Double,
+    EntityMetadataType,
     EquipmentArray,
     Float,
     HeightmapData,
@@ -69,6 +71,7 @@ from pythonium.engine.types import (
     UUIDArray,
     VarInt,
     VarIntArray,
+    VarLongArray,
     WaypointData,
     WorldState,
 )
@@ -90,14 +93,19 @@ class SpawnEntity(Packet, kw_only=True):
 
     entity_id: VarInt
     object_uuid: UUID
+
     type_: VarInt
+
     x: Double
     y: Double
     z: Double
+
     pitch: Byte
     yaw: Byte
     head_pitch: Byte
+
     object_data: VarInt
+
     velocity_x: Short
     velocity_y: Short
     velocity_z: Short
@@ -681,7 +689,7 @@ class Abilities(Packet, kw_only=True):
 
     __packet_name__: ClassVar[str] = "play:clientbound:abilities"
 
-    flags: Byte
+    flags: AbilitiesFlags
     flying_speed: Float
     walking_speed: Float
 
@@ -879,8 +887,8 @@ class MultiBlockChange(Packet, kw_only=True):
 
     __packet_name__: ClassVar[str] = "play:clientbound:multi_block_change"
 
-    chunk_coordinates: Byte
-    records: VarIntArray
+    chunk_coordinates: Long
+    records: VarLongArray
 
 
 class SelectAdvancementTab(Packet, kw_only=True):
@@ -1014,7 +1022,7 @@ class EntityMetadata(Packet, kw_only=True):
     __packet_name__: ClassVar[str] = "play:clientbound:entity_metadata"
 
     entity_id: VarInt
-    metadata: RestBuffer  # TODO(IvanPythonov): suka...
+    metadata: EntityMetadataType
 
 
 class AttachEntity(Packet, kw_only=True):

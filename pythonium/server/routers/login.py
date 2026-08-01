@@ -11,6 +11,7 @@ from pythonium.engine.packets.ingoing import (
     LoginStart,
 )
 from pythonium.engine.packets.outgoing.login import LoginPluginRequest, Success
+from pythonium.engine.player.player import Player
 from pythonium.engine.properties_reader import Properties
 
 logger = getLogger(__name__)
@@ -34,8 +35,9 @@ async def on_login(
             )
         )
 
-    client.session.uuid = player_uuid
-    client.session.username = login_start.username
+    client.player = Player(
+        uuid=player_uuid, username=login_start.username, client=client
+    )
 
     await client.send(
         Success(uuid=player_uuid, name=login_start.username, is_legacy=False)

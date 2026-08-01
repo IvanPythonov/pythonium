@@ -38,14 +38,15 @@ class StringCodec(Codec[str]):
     due to the max size of a valid length VarInt.
     """
 
+    def __init__(self) -> None:
+        self.varint = VarIntCodec()
+
     def serialize(self, *, field: str) -> bytes:
         encoded_field = field.encode("utf-8")
-        return (
-            VarIntCodec().serialize(field=len(encoded_field)) + encoded_field
-        )
+        return self.varint.serialize(field=len(encoded_field)) + encoded_field
 
     def deserialize(self, data: bytes) -> Deserialized[str]:
-        length, varint_size = VarIntCodec().deserialize(data)
+        length, varint_size = self.varint.deserialize(data)
         if length > MAX_STRING_LENGTH:
             raise DecodeError(max_length=MAX_STRING_LENGTH, length=length)
         value = data[varint_size : varint_size + length].decode("utf-8")
@@ -145,25 +146,30 @@ class PositionCodec(Codec[tuple[int, int, int]]):
     Encoded as a 64-bit integer where x, y, z coordinates are packed.
     """
 
+    def __init__(self) -> None:
+        self.long = LongCodec()
+
     def serialize(self, *, field: tuple[int, int, int]) -> bytes:
         x, y, z = field
-        return LongCodec().serialize(
+        return self.long.serialize(
             field=((x & 0x3FFFFFF) << 38)
             | ((z & 0x3FFFFFF) << 12)
             | (y & 0xFFF)
         )
 
     def deserialize(self, data: bytes) -> Deserialized[tuple[int, int, int]]:
-        value, consumed = LongCodec().deserialize(data)
+        value, consumed = self.long.deserialize(data)
 
         x = value >> 38
         z = (value >> 12) & 0x3FFFFFF
         y = value & 0xFFF
 
-        if y >= 1 << 11:
-            y -= 4096
         if x >= 1 << 25:
-            x -= 67108864
+            x -= 1 << 26
+        if y >= 1 << 11:
+            y -= 1 << 12
+        if z >= 1 << 25:
+            z -= 1 << 26
 
         return (x, y, z), consumed
 
@@ -175,22 +181,28 @@ class TextComponentCodec(Codec[dict]):
     In protocol 772 (1.21.x), Text Components are serialized as Network NBT.
     """
 
+    def __init__(self) -> None:
+        self.nbt = NBTCodec()
+
     def serialize(self, *, field: dict) -> bytes:
-        return NBTCodec().serialize(field=field)
+        return self.nbt.serialize(field=field)
 
     def deserialize(self, data: bytes) -> Deserialized[dict]:
-        value, consumed = NBTCodec().deserialize(data)
+        value, consumed = self.nbt.deserialize(data)
         return value, consumed
 
 
 class JsonTextComponentCodec(Codec[str]):
     """Codec for Json Text Components."""
 
+    def __init__(self) -> None:
+        self.string = StringCodec()
+
     def serialize(self, *, field: str) -> bytes:
-        return StringCodec().serialize(field=encode({"text": field}).decode())
+        return self.string.serialize(field=encode({"text": field}).decode())
 
     def deserialize(self, data: bytes) -> Deserialized[str]:
-        return StringCodec().deserialize(data=data)
+        return self.string.deserialize(data=data)
 
 
 class FixedByteArrayCodec(Codec[bytes]):
@@ -216,44 +228,50 @@ class DoubleVectorCodec(Codec[tuple[float, float, float]]):
     """Codec for a 3D Double Vector (X, Y, Z)."""
 
     def __init__(self) -> None:
-        self.double_codec = DoubleCodec()
+        self.double = DoubleCodec()
 
     def serialize(self, *, field: tuple[float, float, float]) -> bytes:
         x, y, z = field
         return b"".join(
             [
-                self.double_codec.serialize(field=x),
-                self.double_codec.serialize(field=y),
-                self.double_codec.serialize(field=z),
+                self.double.serialize(field=x),
+                self.double.serialize(field=y),
+                self.double.serialize(field=z),
             ]
         )
 
     def deserialize(
         self, data: bytes
     ) -> Deserialized[tuple[float, float, float]]:
-        x, c1 = self.double_codec.deserialize(data)
-        y, c2 = self.double_codec.deserialize(data[c1:])
-        z, c3 = self.double_codec.deserialize(data[c1 + c2 :])
+        x, c1 = self.double.deserialize(data)
+        y, c2 = self.double.deserialize(data[c1:])
+        z, c3 = self.double.deserialize(data[c1 + c2 :])
         return (x, y, z), c1 + c2 + c3
 
 
 class PrefixedByteArrayCodec(Codec[bytes]):
     """Codec for a byte array prefixed with its length as a VarInt."""
 
+    def __init__(self) -> None:
+        self.varint = VarIntCodec()
+
     def serialize(self, *, field: bytes) -> bytes:
-        return VarIntCodec().serialize(field=len(field)) + field
+        return self.varint.serialize(field=len(field)) + field
 
     def deserialize(self, data: bytes) -> Deserialized[bytes]:
-        length, offset = VarIntCodec().deserialize(data)
+        length, offset = self.varint.deserialize(data)
         return data[offset : offset + length], offset + length
 
 
 class PrefixedLongByteArrayCodec(Codec[bytes]):
     """Codec for a byte array prefixed with its length as a VarInt."""
 
+    def __init__(self) -> None:
+        self.varint = VarIntCodec()
+
     def serialize(self, *, field: bytes) -> bytes:
-        return VarIntCodec().serialize(field=len(field)) + field
+        return self.varint.serialize(field=len(field)) + field
 
     def deserialize(self, data: bytes) -> Deserialized[bytes]:
-        byte_len, offset = VarIntCodec().deserialize(data)
+        byte_len, offset = self.varint.deserialize(data)
         return data[offset : offset + byte_len], offset + byte_len

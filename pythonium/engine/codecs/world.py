@@ -9,8 +9,8 @@ from pythonium.engine.codecs.custom import (
 from pythonium.engine.codecs.primitives import (
     BooleanCodec,
     ByteCodec,
-    LongCodec,
     UnsignedByteCodec,
+    UnsignedLongCodec,
 )
 from pythonium.engine.exceptions import EncodeError
 from pythonium.engine.typealiases import Deserialized
@@ -39,7 +39,7 @@ class WorldStateCodec(Codec[WorldStateStruct]):
     def __init__(self) -> None:
         self.varint = VarIntCodec()
         self.string = StringCodec()
-        self.long = LongCodec()
+        self.unsigned_long = UnsignedLongCodec()
         self.ubyte = UnsignedByteCodec()
         self.byte = ByteCodec()
         self.boolean = BooleanCodec()
@@ -50,7 +50,7 @@ class WorldStateCodec(Codec[WorldStateStruct]):
         out = bytearray()
         out.extend(self.varint.serialize(field=field.dimension_type))
         out.extend(self.string.serialize(field=field.dimension_name))
-        out.extend(self.long.serialize(field=field.hashed_seed))
+        out.extend(self.unsigned_long.serialize(field=field.hashed_seed))
         out.extend(self.ubyte.serialize(field=field.game_mode))
         out.extend(self.byte.serialize(field=field.previous_game_mode))
         out.extend(self.boolean.serialize(field=field.is_debug))
@@ -85,7 +85,7 @@ class WorldStateCodec(Codec[WorldStateStruct]):
         dim_name, c = self.string.deserialize(data[offset:])
         offset += c
 
-        seed, c = self.long.deserialize(data[offset:])
+        seed, c = self.unsigned_long.deserialize(data[offset:])
         offset += c
 
         gm, c = self.ubyte.deserialize(data[offset:])

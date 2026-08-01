@@ -21,7 +21,7 @@ from pythonium.engine.formatter import format_packet
 from pythonium.engine.packets.factory import SerializeFactory
 from pythonium.engine.packets.packet_storage import PacketStorage
 from pythonium.engine.types import VarInt
-from pythonium.registries.protocol_storage import get_data_by_packet_name
+from pythonium.registries.protocol_storage import PROTOCOL_REGISTRY
 
 _VARINT_CODEC = VarIntCodec()
 _STRING_CODEC = StringCodec()
@@ -58,8 +58,8 @@ class Packet(Struct, kw_only=True):
             msg = f"{cls.__name__} must define `__packet_name__`"
             raise NotImplementedError(msg)
 
-        state, direction, packet_id = get_data_by_packet_name(
-            packet_name=cls.__packet_name__
+        state, direction, packet_id = PROTOCOL_REGISTRY.get(
+            cls.__packet_name__
         )
 
         cls.state = state

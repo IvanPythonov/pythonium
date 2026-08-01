@@ -27,6 +27,18 @@ class ClientConnection:
         except (ConnectionResetError, BrokenPipeError, RuntimeError) as e:
             raise WriterError(error=e.__class__.__name__) from e
 
+    async def write_many(self, data_list: list[bytes]) -> None:
+        if self.writer.is_closing():
+            raise WriterError(
+                is_closed=self.writer.is_closing(),
+                info="Transport is already closed.",
+            )
+
+        try:
+            self.writer.writelines(data_list)
+        except (ConnectionResetError, BrokenPipeError, RuntimeError) as e:
+            raise WriterError(error=e.__class__.__name__) from e
+
     async def read(self, n: int | None = None) -> bytes | None:
         return await self.reader.read(n or MAX_PACKET_LENGTH)
 
